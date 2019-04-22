@@ -138,7 +138,7 @@ class App extends React.Component<{}, State> {
           actions={this.actionManager}
           leftDrawerChildren={navDrawerContents}
           rightDrawerChildren={propertiesDrawerContents}
-          title={(this.state.document && this.state.document.name) || "GraphIt"}
+          title={(this.state.document && this.state.document.name) || "Autograph"}
           innerRef={this.setAppRootRef}
           appBarActionButtons={appBarActionButtons}
           renderSearchPopperContents={this.maybeRenderSearchPopper}
@@ -340,7 +340,7 @@ class App extends React.Component<{}, State> {
       this.state.document === null
         ? ""
         : `${this.state.document.name} - `,
-      "GraphIt",
+      "Autograph",
     ].join("");
   }
 
