@@ -39,6 +39,7 @@ export interface Props extends WithStyles<ReturnType<typeof stylesFunc>> {
   rightDrawerChildren: any;
   title: string;
   appBarActionButtons?: ActionButtonDef[];
+  showSearchField: boolean;
   renderSearchPopperContents?: (searchQuery: string) => JSX.Element | string | null;
   onSearchFieldFocusChange?: (newValue: boolean) => void;
 }
@@ -66,7 +67,7 @@ export class MyAppRootInner extends React.Component<Props, State> {
           title={this.props.title}
           onClickMenuButton={this.openLeftDrawer}
           actionButtons={this.props.appBarActionButtons}
-          showSearchField={true}
+          showSearchField={this.props.showSearchField}
           onSearchChanged={this.handleSearchChanged}
           onSearchFocusChanged={this.handleSearchFocusChanged}
           searchRef={this.setSearchRef}

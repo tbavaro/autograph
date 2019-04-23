@@ -141,6 +141,7 @@ class App extends React.Component<{}, State> {
           title={(this.state.document && this.state.document.name) || "Autograph"}
           innerRef={this.setAppRootRef}
           appBarActionButtons={appBarActionButtons}
+          showSearchField={this.state.document !== null}
           renderSearchPopperContents={this.maybeRenderSearchPopper}
           onSearchFieldFocusChange={this.setSimulationIsPaused}
         >
