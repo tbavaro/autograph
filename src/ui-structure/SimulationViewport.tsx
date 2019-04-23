@@ -30,7 +30,7 @@ class FPSView {
     this.element.className = "SimulationViewport-FPSView";
     document.body.appendChild(this.element);
     this.ticksSinceUpdate = 0;
-    this.lastUpdateTime = new Date().getTime();
+    this.lastUpdateTime = Date.now();
     this.intervalId = window.setInterval(this.update, 1000);
   }
 
@@ -52,7 +52,7 @@ class FPSView {
   }
 
   private update = () => {
-    const now = new Date().getTime();
+    const now = Date.now();
     const diff = now - this.lastUpdateTime;
     const fps = this.ticksSinceUpdate / (diff / 1000);
     if (this.element) {
