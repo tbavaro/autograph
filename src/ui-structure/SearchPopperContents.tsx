@@ -26,21 +26,6 @@ interface State {
   latestAnsweredResults: MyNodeDatum[];
 }
 
-const elementHelper = document.createElement("div");
-
-// hack until i remove html labels
-function cleanLabel(label: string) {
-  let headersRemoved = label.replace(/\<[^\>]*\>/g, "\t").trim().replace(/\t+/g, " / ");
-
-  // fix html entities
-  if (/&/.exec(headersRemoved)) {
-    elementHelper.innerHTML = headersRemoved;
-    headersRemoved = elementHelper.innerText;
-  }
-
-  return headersRemoved;
-}
-
 class SearchPopperContents extends React.PureComponent<Props, State> {
   public state: State = {
     maxHeightPx: 100,
@@ -146,7 +131,7 @@ class MyResultListItem extends React.PureComponent<MyResultListItemProps, {}> {
     const { node } = this.props;
     return (
       <ListItem button={true} onClick={this.handleClick} disabled={this.props.disabled}>
-        <ListItemText primary={cleanLabel(node.label)}/>
+        <ListItemText primary={node.label}/>
       </ListItem>
     );
   }
