@@ -7,14 +7,13 @@ import * as GoogleApi from "../google/GoogleApi";
 const NODES_SHEET = "nodes";
 const NODE_ID_KEY = "id";
 const NODE_LABEL_KEY = "label";
+const NODE_SECONDARY_LABEL_KEY = "secondaryLabel";
 const NODE_COLOR_KEY = "color";
 
 const LINKS_SHEET = "links";
 const LINK_SOURCE_ID_KEY = "source";
 const LINK_TARGET_ID_KEY = "target";
 const LINK_STROKE_KEY = "stroke";
-
-const LOOKS_LIKE_HTML_REGEX = /<\s*\/[^>]*>|<[^>]*\/\s*>/;
 
 function removeUndefineds<T>(values: Array<T | undefined>): T[] {
   return values.filter((v) => v !== undefined) as T[];
@@ -36,6 +35,7 @@ export const internals = {
   createSGDFromDataColumns(attrs: {
     nodeIds: string[],
     nodeLabels: string[],
+    nodeSecondaryLabels?: string[],
     nodeColors?: string[],
     linkSourceIds: string[],
     linkTargetIds: string[],
@@ -48,12 +48,15 @@ export const internals = {
 
       const result: GraphData.SerializedNode = {
         id: id,
-        label: nthIfDefinedElseDefault(attrs.nodeLabels, index, id),
-        secondaryLabel: "secondary label"  // XCXC
+        label: nthIfDefinedElseDefault(attrs.nodeLabels, index, id)
       };
 
       if (attrs.nodeColors !== undefined) {
         result.color = nthIfDefinedElseDefault(attrs.nodeColors, index, "") || null;
+      }
+
+      if (attrs.nodeSecondaryLabels !== undefined) {
+        result.secondaryLabel = nthIfDefinedElseDefault(attrs.nodeSecondaryLabels, index, "") || null;
       }
 
       return result;
@@ -96,9 +99,9 @@ export const internals = {
     nodesData: any[][],
     linksData: any[][]
   }) {
-    const [nodeIds, nodeLabels, nodeColors] = this.extractNamedColumnsToStringArrays(
+    const [nodeIds, nodeLabels, nodeSecondaryLabels, nodeColors] = this.extractNamedColumnsToStringArrays(
       attrs.nodesData, [
-        NODE_ID_KEY, NODE_LABEL_KEY, NODE_COLOR_KEY
+        NODE_ID_KEY, NODE_LABEL_KEY, NODE_SECONDARY_LABEL_KEY, NODE_COLOR_KEY
       ]
     );
     const [linkSourceIds, linkTargetIds, linkStrokes] = this.extractNamedColumnsToStringArrays(
@@ -109,6 +112,7 @@ export const internals = {
     const result = this.createSGDFromDataColumns({
       nodeIds: assertDefined(nodeIds, "nodeIds"),
       nodeLabels: assertDefined(nodeLabels, "nodeLabels"),
+      nodeSecondaryLabels: nodeSecondaryLabels,
       nodeColors: nodeColors,
       linkSourceIds: assertDefined(linkSourceIds, "linkSourceIds"),
       linkTargetIds: assertDefined(linkTargetIds, "linkTargetIds"),
@@ -143,10 +147,6 @@ export const internals = {
         return extractValuesAsStringSkipFirst(data[index]);
       }
     });
-  },
-
-  looksLikeHtml(value: string) {
-    return (LOOKS_LIKE_HTML_REGEX.exec(value) !== null);
   }
 };
 

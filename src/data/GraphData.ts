@@ -23,7 +23,7 @@ export const DEFAULT_LINK_DISTANCE = 100;
 export type SerializedNodeV1 = {
   id: Id;
   label: string;
-  secondaryLabel: string | null;
+  secondaryLabel?: string | null;
   color?: string | null;
   isLocked?: boolean;
   x?: number | null;
