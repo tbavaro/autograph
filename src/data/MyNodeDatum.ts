@@ -4,6 +4,7 @@ import * as GraphData from "./GraphData";
 export interface MyNodeDatum extends d3.SimulationNodeDatum {
   id: string;
   label: string;
+  secondaryLabel: string | null;
   isLocked: boolean;
   color?: string | null;
 }

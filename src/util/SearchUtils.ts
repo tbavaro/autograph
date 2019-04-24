@@ -7,9 +7,8 @@ export class NodeSearchHelper {
 
   constructor(nodes: ReadonlyArray<MyNodeDatum>) {
     const options: Fuse.FuseOptions<MyNodeDatum> = {
-      keys: ["label"],
+      keys: ["label", "secondaryLabel"],
       tokenize: true,
-      matchAllTokens: true,
       threshold: 0.6
     };
 

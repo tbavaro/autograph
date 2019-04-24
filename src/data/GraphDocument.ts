@@ -142,6 +142,7 @@ export class GraphDocument {
       const node: MyNodeDatum = {
         id: sn.id,
         label: sn.label,
+        secondaryLabel: sn.secondaryLabel,
         isLocked: sn.isLocked,
         color: sn.color,
         x: (sn.x === null ? undefined : sn.x),

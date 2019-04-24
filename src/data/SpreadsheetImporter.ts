@@ -48,7 +48,8 @@ export const internals = {
 
       const result: GraphData.SerializedNode = {
         id: id,
-        label: nthIfDefinedElseDefault(attrs.nodeLabels, index, id)
+        label: nthIfDefinedElseDefault(attrs.nodeLabels, index, id),
+        secondaryLabel: "secondary label"  // XCXC
       };
 
       if (attrs.nodeColors !== undefined) {

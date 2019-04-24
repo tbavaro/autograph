@@ -23,6 +23,7 @@ export const DEFAULT_LINK_DISTANCE = 100;
 export type SerializedNodeV1 = {
   id: Id;
   label: string;
+  secondaryLabel: string | null;
   color?: string | null;
   isLocked?: boolean;
   x?: number | null;
@@ -145,6 +146,7 @@ export const documentDefaults = DeepReadonly.deepFreeze<Defaults.Defaults<Serial
     {
       id: REQUIRED_VALUE,
       label: REQUIRED_VALUE,
+      secondaryLabel: null,
       color: null,
       isLocked: false,
       x: null,

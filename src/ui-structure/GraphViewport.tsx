@@ -145,6 +145,7 @@ export class Component extends React.PureComponent<Props, State> {
         actionManager={this.nodeActionManager}
         id={index}
         label={node.label}
+        secondaryLabel={node.secondaryLabel}
         isLocked={node.isLocked}
         color={node.color || undefined}
         initialX={node.x || 0}

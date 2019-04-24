@@ -131,7 +131,7 @@ class MyResultListItem extends React.PureComponent<MyResultListItemProps, {}> {
     const { node } = this.props;
     return (
       <ListItem button={true} onClick={this.handleClick} disabled={this.props.disabled}>
-        <ListItemText primary={node.label}/>
+        <ListItemText primary={node.label} secondary={node.secondaryLabel || undefined}/>
       </ListItem>
     );
   }

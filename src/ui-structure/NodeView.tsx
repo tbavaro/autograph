@@ -11,6 +11,7 @@ export interface NodeActionManager {
 
 type SharedProps = {
   label: string;
+  secondaryLabel: string | null;
   color?: string;
   isLocked: boolean;
   isSelected: boolean;
@@ -46,8 +47,18 @@ export class InnerComponent extends React.Component<InnerProps, {}> {
           }
         )}
         onDoubleClick={this.props.onDoubleClick}
-        children={this.props.label}
-      />
+      >
+        {
+          this.props.secondaryLabel === null
+            ? this.props.label
+            : (
+              <React.Fragment>
+                {this.props.label}
+                <h6>{this.props.secondaryLabel}</h6>
+              </React.Fragment>
+            )
+        }
+      </div>
     );
   }
 }

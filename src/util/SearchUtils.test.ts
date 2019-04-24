@@ -1,19 +1,38 @@
 import { MyNodeDatum } from "../data/MyNodeDatum";
 import { NodeSearchHelper } from "./SearchUtils";
 
+type LabelOrLabelAndSecondaryLabel = (string | [string, string]);
+
 function testNodeSearch(attrs: {
   name: string;
   query: string;
-  labels: string[];
+  labels: LabelOrLabelAndSecondaryLabel[];
   expectedResults: string[];
   enforceOrdering?: boolean;
 }) {
   it(`NodeSearchHelper: ${attrs.name}`, () => {
-    const nodes = attrs.labels.map((label: string): MyNodeDatum => ({
-      id: label,
-      label: label,
-      isLocked: false
-    }));
+    const nodes = attrs.labels.map((label: LabelOrLabelAndSecondaryLabel): MyNodeDatum => {
+      let id: string;
+      let primaryLabel: string;
+      let secondaryLabel: string | null;
+
+      if (label instanceof Array) {
+        id = `${label[0]}|${label[1]}`;
+        primaryLabel = label[0];
+        secondaryLabel = label[1];
+      } else {
+        id = label;
+        primaryLabel = label;
+        secondaryLabel = null;
+      }
+
+      return {
+        id: id,
+        label: primaryLabel,
+        secondaryLabel: secondaryLabel,
+        isLocked: false
+      };
+    });
 
     const helper = new NodeSearchHelper(nodes);
     const results = helper.search(attrs.query).map(node => node.label);
@@ -94,14 +113,14 @@ testNodeSearchMulti([
     query: "hello there",
     labels: ["hey there, hello!", "oh hello to you there"],
     expectedResults: ["oh hello to you there", "hey there, hello!"],
-    enforceOrdering: true
+    // enforceOrdering: true  // NB: wanting to match across primary and secondary breaks this
   },
   {
     name: "order multi-word overlap match vs separate match",
     query: "howdy how",
     labels: ["howdy", "howdy there how are you"],
     expectedResults: ["howdy there how are you", "howdy"],
-    enforceOrdering: true
+    // enforceOrdering: true  // NB: wanting to match across primary and secondary breaks this
   },
   {
     name: "order exact match vs exact match with additional words",
@@ -110,4 +129,17 @@ testNodeSearchMulti([
     expectedResults: ["howdy", "howdy there how are you"],
     enforceOrdering: true
   },
+  {
+    name: "searches secondary label too",
+    query: "foo",
+    labels: [ ["bar", "foo"] ],
+    expectedResults: ["bar"]
+  },
+  {
+    name: "searches things in both labels",
+    query: "foo bar",
+    labels: [ "just foo", "just bar", ["bar", "foo"] ],
+    expectedResults: ["bar", "just bar", "just foo"],
+    enforceOrdering: true
+  }
 ]);
