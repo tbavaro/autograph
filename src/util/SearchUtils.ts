@@ -9,6 +9,7 @@ export class NodeSearchHelper {
     const options: Fuse.FuseOptions<MyNodeDatum> = {
       keys: ["label", "secondaryLabel"],
       tokenize: true,
+      matchAllTokens: true,
       threshold: 0.6
     };
 

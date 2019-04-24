@@ -113,14 +113,14 @@ testNodeSearchMulti([
     query: "hello there",
     labels: ["hey there, hello!", "oh hello to you there"],
     expectedResults: ["oh hello to you there", "hey there, hello!"],
-    // enforceOrdering: true  // NB: wanting to match across primary and secondary breaks this
+    enforceOrdering: true
   },
   {
     name: "order multi-word overlap match vs separate match",
     query: "howdy how",
     labels: ["howdy", "howdy there how are you"],
     expectedResults: ["howdy there how are you", "howdy"],
-    // enforceOrdering: true  // NB: wanting to match across primary and secondary breaks this
+    enforceOrdering: true
   },
   {
     name: "order exact match vs exact match with additional words",
@@ -135,11 +135,11 @@ testNodeSearchMulti([
     labels: [ ["bar", "foo"] ],
     expectedResults: ["bar"]
   },
-  {
-    name: "searches things in both labels",
-    query: "foo bar",
-    labels: [ "just foo", "just bar", ["bar", "foo"] ],
-    expectedResults: ["bar", "just bar", "just foo"],
-    enforceOrdering: true
-  }
+  // {
+  //   name: "searches things in both labels",
+  //   query: "foo bar",
+  //   labels: [ "just foo", "just bar", ["bar", "foo"] ],
+  //   expectedResults: ["bar", "just bar", "just foo"],
+  //   enforceOrdering: true
+  // }
 ]);
