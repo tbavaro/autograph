@@ -203,13 +203,6 @@ export function loadDocumentFromSheet(sheetId: string): PromiseLike<GraphData.Se
           linksData: sheetValues[1]
         });
 
-        // hack to use html rendering if it looks like the data has html
-        const usesHtml = ((sgd.nodes || []).map((node) => node.label).find(internals.looksLikeHtml) !== undefined);
-        if (usesHtml) {
-          sgd.displayConfig = sgd.displayConfig || {};
-          sgd.displayConfig.nodeRenderMode = "raw_html";
-        }
-
         return sgd;
       },
       (error) => {

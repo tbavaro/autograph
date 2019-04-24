@@ -132,6 +132,11 @@ export class GraphDocument {
     this.name = attrs.name;
     this.data = attrs.data;
 
+    if (this.data.displayConfig.nodeRenderMode === "raw_html") {
+      console.warn(`ignoring deprecated render mode: ${this.data.displayConfig.nodeRenderMode}`);
+      this.data.displayConfig.nodeRenderMode = "basic";
+    }
+
     const idToNodeMap = new Map<string, MyNodeDatum>();
     this.nodes = this.data.nodes.map(sn => {
       const node: MyNodeDatum = {

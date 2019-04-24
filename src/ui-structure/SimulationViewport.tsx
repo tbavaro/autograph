@@ -152,7 +152,6 @@ export class Component extends ListenerPureComponent<Props, State> {
         nodes={this.props.document.nodes}
         links={this.props.document.links}
         zoomState={this.props.document.zoomState}
-        nodeRenderMode={this.props.document.displayConfig.nodeRenderMode}
         onChange={this.onChange}
       />
     );

@@ -4,16 +4,12 @@ import * as React from "react";
 
 import "./NodeView.css";
 
-import { Document } from "../data/GraphData";
-import { sanitizeForDisplay } from "../util/HtmlSanitization";
-
 export interface NodeActionManager {
   onNodeMoved: (id: number, x: number, y: number, stopped: boolean) => void;
   toggleIsLocked: (id: number) => void;
 }
 
 type SharedProps = {
-  renderMode: Document["displayConfig"]["nodeRenderMode"];
   label: string;
   color?: string;
   isLocked: boolean;
@@ -35,18 +31,6 @@ type Props = SharedProps & {
 
 export class InnerComponent extends React.Component<InnerProps, {}> {
   public render() {
-    let children: string | undefined;
-    let innerHTML: { __html: string } | undefined;
-    switch (this.props.renderMode) {
-      case "raw_html":
-        innerHTML = { __html: sanitizeForDisplay(this.props.label) };
-        break;
-
-      case "basic":
-      default:
-        children = this.props.label;
-        break;
-    }
     const contentStyle = {
       backgroundColor: this.props.isSelected ? undefined : this.props.color,
       ...this.props.extraStyle
@@ -62,8 +46,7 @@ export class InnerComponent extends React.Component<InnerProps, {}> {
           }
         )}
         onDoubleClick={this.props.onDoubleClick}
-        children={children}
-        dangerouslySetInnerHTML={innerHTML}
+        children={this.props.label}
       />
     );
   }

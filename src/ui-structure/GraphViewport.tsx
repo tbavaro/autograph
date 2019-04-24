@@ -60,7 +60,6 @@ export type Props = {
   nodes: ReadonlyArray<MyNodeDatum>;
   links: ReadonlyArray<MyLinkDatum>;
   zoomState: GraphData.ZoomState;
-  nodeRenderMode: GraphData.NodeRenderMode;
   onChange?: () => void;
 };
 
@@ -148,7 +147,6 @@ export class Component extends React.PureComponent<Props, State> {
         label={node.label}
         isLocked={node.isLocked}
         color={node.color || undefined}
-        renderMode={this.props.nodeRenderMode}
         initialX={node.x || 0}
         initialY={node.y || 0}
         isSelected={this.state.selectedNodeIndexes.has(index)}

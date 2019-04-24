@@ -81,7 +81,7 @@ export type SerializedLayoutStateV1 = {
  */
 export type SerializedNodeRenderModeV1 = (
   "basic" |
-  "raw_html"
+  "raw_html"  // deprecated
 );
 
 /**
