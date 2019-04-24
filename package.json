@@ -1,7 +1,7 @@
 {
   "name": "autograph",
   "homepage": ".",
-  "version": "0.13.2",
+  "version": "0.13.3",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^3.9.3",
