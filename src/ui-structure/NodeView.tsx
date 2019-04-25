@@ -12,6 +12,7 @@ export interface NodeActionManager {
 type SharedProps = {
   label: string;
   secondaryLabel: string | null;
+  url: string | null;
   color?: string;
   isLocked: boolean;
   isSelected: boolean;
@@ -32,6 +33,15 @@ type Props = SharedProps & {
 
 export class InnerComponent extends React.Component<InnerProps, {}> {
   public render() {
+    const primaryLabelElement = (
+      this.props.url === null
+        ? this.props.label
+        : (
+            <a href={this.props.url} target="#">
+              {this.props.label}
+            </a>
+          )
+    );
     const contentStyle = {
       backgroundColor: this.props.isSelected ? undefined : this.props.color,
       ...this.props.extraStyle
@@ -50,10 +60,10 @@ export class InnerComponent extends React.Component<InnerProps, {}> {
       >
         {
           this.props.secondaryLabel === null
-            ? this.props.label
+            ? primaryLabelElement
             : (
               <React.Fragment>
-                {this.props.label}
+                {primaryLabelElement}
                 <h6>{this.props.secondaryLabel}</h6>
               </React.Fragment>
             )

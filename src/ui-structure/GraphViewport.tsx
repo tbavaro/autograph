@@ -146,6 +146,7 @@ export class Component extends React.PureComponent<Props, State> {
         id={index}
         label={node.label}
         secondaryLabel={node.secondaryLabel}
+        url={node.secondaryLabel ? "https://google.com" : null}
         isLocked={node.isLocked}
         color={node.color || undefined}
         initialX={node.x || 0}
