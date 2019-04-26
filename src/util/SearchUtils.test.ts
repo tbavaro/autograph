@@ -30,6 +30,7 @@ function testNodeSearch(attrs: {
         id: id,
         label: primaryLabel,
         secondaryLabel: secondaryLabel,
+        url: null,
         isLocked: false
       };
     });

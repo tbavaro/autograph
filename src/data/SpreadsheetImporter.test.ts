@@ -89,11 +89,12 @@ it("test simple spreadsheet with colors", () => {
   });
 });
 
-it("test simple spreadsheet with secondary labels", () => {
+it("test simple spreadsheet with secondary labels and urls", () => {
   const result = internals.createSGDFromDataColumns({
     nodeIds: [ "a", "b", "c" ],
     nodeLabels: [ "node a", "node b", "node c" ],
     nodeSecondaryLabels: [ "a2", "", "c2" ],
+    nodeUrls: [ "", "://b", "://c" ],
     linkSourceIds: [ "a", "b" ],
     linkTargetIds: [ "b", "c" ]
   });
@@ -102,17 +103,20 @@ it("test simple spreadsheet with secondary labels", () => {
       {
         id: "a",
         label: "node a",
-        secondaryLabel: "a2"
+        secondaryLabel: "a2",
+        url: null
       },
       {
         id: "b",
         label: "node b",
-        secondaryLabel: null
+        secondaryLabel: null,
+        url: "://b"
       },
       {
         id: "c",
         label: "node c",
-        secondaryLabel: "c2"
+        secondaryLabel: "c2",
+        url: "://c"
       }
     ],
     links: [

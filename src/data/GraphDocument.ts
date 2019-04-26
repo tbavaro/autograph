@@ -143,6 +143,7 @@ export class GraphDocument {
         id: sn.id,
         label: sn.label,
         secondaryLabel: sn.secondaryLabel,
+        url: sn.url,
         isLocked: sn.isLocked,
         color: sn.color,
         x: (sn.x === null ? undefined : sn.x),

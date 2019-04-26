@@ -8,6 +8,7 @@ const NODES_SHEET = "nodes";
 const NODE_ID_KEY = "id";
 const NODE_LABEL_KEY = "label";
 const NODE_SECONDARY_LABEL_KEY = "secondaryLabel";
+const NODE_URL_KEY = "url";
 const NODE_COLOR_KEY = "color";
 
 const LINKS_SHEET = "links";
@@ -36,6 +37,7 @@ export const internals = {
     nodeIds: string[],
     nodeLabels: string[],
     nodeSecondaryLabels?: string[],
+    nodeUrls?: string[],
     nodeColors?: string[],
     linkSourceIds: string[],
     linkTargetIds: string[],
@@ -57,6 +59,10 @@ export const internals = {
 
       if (attrs.nodeSecondaryLabels !== undefined) {
         result.secondaryLabel = nthIfDefinedElseDefault(attrs.nodeSecondaryLabels, index, "") || null;
+      }
+
+      if (attrs.nodeUrls !== undefined) {
+        result.url = nthIfDefinedElseDefault(attrs.nodeUrls, index, "") || null;
       }
 
       return result;
@@ -99,9 +105,9 @@ export const internals = {
     nodesData: any[][],
     linksData: any[][]
   }) {
-    const [nodeIds, nodeLabels, nodeSecondaryLabels, nodeColors] = this.extractNamedColumnsToStringArrays(
+    const [nodeIds, nodeLabels, nodeSecondaryLabels, nodeColors, nodeUrls] = this.extractNamedColumnsToStringArrays(
       attrs.nodesData, [
-        NODE_ID_KEY, NODE_LABEL_KEY, NODE_SECONDARY_LABEL_KEY, NODE_COLOR_KEY
+        NODE_ID_KEY, NODE_LABEL_KEY, NODE_SECONDARY_LABEL_KEY, NODE_COLOR_KEY, NODE_URL_KEY
       ]
     );
     const [linkSourceIds, linkTargetIds, linkStrokes] = this.extractNamedColumnsToStringArrays(
@@ -113,6 +119,7 @@ export const internals = {
       nodeIds: assertDefined(nodeIds, "nodeIds"),
       nodeLabels: assertDefined(nodeLabels, "nodeLabels"),
       nodeSecondaryLabels: nodeSecondaryLabels,
+      nodeUrls: nodeUrls,
       nodeColors: nodeColors,
       linkSourceIds: assertDefined(linkSourceIds, "linkSourceIds"),
       linkTargetIds: assertDefined(linkTargetIds, "linkTargetIds"),
