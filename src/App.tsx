@@ -530,6 +530,16 @@ class App extends React.Component<{}, State> {
         this.simulationConfigListener.triggerListeners();
       }
     },
+    unlockAllNodes: () => {
+      const document = this.state.document;
+      if (document !== null) {
+        document.nodes.forEach(node => {
+          node.fx = undefined;
+          node.fy = undefined;
+        });
+        this.simulationConfigListener.triggerListeners();
+      }
+    },
 
     // data source
     connectSpreadsheet: () => {

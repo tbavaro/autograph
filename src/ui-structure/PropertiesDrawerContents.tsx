@@ -84,6 +84,7 @@ export interface Actions {
   connectSpreadsheet: () => void;
   disconnectSpreadsheet: () => void;
   mergeConnectedSpreadsheetData: () => void;
+  unlockAllNodes: () => void;
 }
 
 interface Props {
@@ -150,6 +151,7 @@ class PropertiesDrawerContents extends React.Component<Props, State> {
               <React.Fragment>
                 {this.renderSimulationProperties(this.props.document)}
                 {this.renderDataSourceProperties(this.props.document)}
+                {this.renderOtherActions()}
               </React.Fragment>
             )
         }
@@ -163,7 +165,7 @@ class PropertiesDrawerContents extends React.Component<Props, State> {
       <List
         dense={true}
         subheader={(
-          <ListSubheader>Simulation properties</ListSubheader>
+          <ListSubheader disableSticky={true}>Simulation properties</ListSubheader>
         )}
       >
         <MySliderListItem
@@ -208,7 +210,7 @@ class PropertiesDrawerContents extends React.Component<Props, State> {
     return (
       <List
         dense={true}
-        subheader={<ListSubheader>Data source</ListSubheader>}
+        subheader={<ListSubheader disableSticky={true}>Data source</ListSubheader>}
       >
         {
           dataSource.connectedSpreadsheetId === null
@@ -220,13 +222,31 @@ class PropertiesDrawerContents extends React.Component<Props, State> {
   }
 
   private renderConnectSpreadsheetButtonListItem() {
+    return this.renderButtonListItem({
+      label: "Connect spreadsheet...",
+      onClick: this.props.actions.connectSpreadsheet
+    });
+  }
+
+  private renderButtonListItem(attrs: {
+    label: string,
+    onClick: () => void,
+    key?: string,
+    disabled?: boolean
+  }) {
     return (
-      <ListItem button={true} onClick={this.props.actions.connectSpreadsheet}>
+      <ListItem button={false} key={attrs.key} className="PropertiesDrawerContents-buttonListItem">
         <ListItemText
-          primary="Connect spreadsheet..."
-          primaryTypographyProps={{
-            color: "secondary"
-          }}
+          primary={
+            <Button
+              variant="outlined"
+              fullWidth={true}
+              onClick={attrs.onClick}
+              disabled={attrs.disabled}
+              children={attrs.label}
+            />
+          }
+          className="PropertiesDrawerContents-buttonListItemText"
         />
       </ListItem>
     );
@@ -277,22 +297,29 @@ class PropertiesDrawerContents extends React.Component<Props, State> {
           </ListItemSecondaryAction>
         </ListItem>
       </Link>),
-      (<ListItem button={false} key="updateButton" className="PropertiesDrawerContents-updateButtonListItem">
-        <ListItemText
-          primary={
-            <Button
-              variant="outlined"
-              fullWidth={true}
-              onClick={this.props.actions.mergeConnectedSpreadsheetData}
-              disabled={!isLoaded}
-            >
-              Update data
-            </Button>
-          }
-          className="PropertiesDrawerContents-updateButtonListItemText"
-        />
-      </ListItem>)
+      this.renderButtonListItem({
+        label: "Update data",
+        onClick: this.props.actions.mergeConnectedSpreadsheetData,
+        key: "updateButton",
+        disabled: !isLoaded
+      })
     ];
+  }
+
+  private renderOtherActions() {
+    return (
+      <List
+        dense={true}
+        subheader={<ListSubheader disableSticky={true}>Other actions</ListSubheader>}
+      >
+        {
+          this.renderButtonListItem({
+            label: "Unlock all nodes",
+            onClick: this.props.actions.unlockAllNodes
+          })
+        }
+      </List>
+    );
   }
 
   private loadingSheetId: string | null = null;
