@@ -153,6 +153,7 @@ export class Component extends React.PureComponent<Props, State> {
         initialY={node.y || 0}
         isSelected={this.state.selectedNodeIndexes.has(index)}
         dragBehavior={this.drag}
+        onClick={this.onClickNode}
       />
     ));
   }
@@ -188,8 +189,20 @@ export class Component extends React.PureComponent<Props, State> {
     }
   }
 
+  private onClickNode = (index: number, metaKey: boolean) => {
+    this.updateSelection(index, /* clearOthers= */!metaKey);
+  }
+
   private onDrag = (index: number, dx: number, dy: number, isEnd: boolean) => {
-    this.state.selectedNodeIndexes.forEach(i => {
+    if (dx === 0 && dy === 0) {
+      return;
+    }
+
+    let indexes = this.state.selectedNodeIndexes;
+    if (this.dragStartIndex !== null && !indexes.has(this.dragStartIndex)) {
+      indexes = this.updateSelection(index, /* clearOthers= */!this.dragStartedWithMetaKey);
+    }
+    indexes.forEach(i => {
       const node = this.props.nodes[i];
 
       if (dx !== 0 || dy !== 0) {
@@ -212,9 +225,20 @@ export class Component extends React.PureComponent<Props, State> {
     }
   }
 
+  private dragStartIndex: number | null = null;
+  private dragStartedWithMetaKey: boolean = false;
   private onDragStart = (index: number, metaKey: boolean) => {
+    this.dragStartIndex = index;
+    this.dragStartedWithMetaKey = metaKey;
+
+    // this.updateSelection(index, /* clearOthers= */!metaKey);
+
+    this.onDrag(index, 0, 0, false);
+  }
+
+  private updateSelection(index: number, clearOthers: boolean) {
     let newSelectedNodeIndexes: Set<number> | undefined;
-    if (!metaKey) {
+    if (clearOthers) {
       // if the node is already selected, don't do anything else
       if (!this.state.selectedNodeIndexes.has(index)) {
         newSelectedNodeIndexes = new Set([index]);
@@ -234,7 +258,7 @@ export class Component extends React.PureComponent<Props, State> {
       });
     }
 
-    this.onDrag(index, 0, 0, false);
+    return newSelectedNodeIndexes || this.state.selectedNodeIndexes;
   }
 
   private deselectAll = () => {

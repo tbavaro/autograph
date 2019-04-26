@@ -29,7 +29,12 @@ type Props = SharedProps & {
   initialX: number;
   initialY: number;
   dragBehavior?: D3.DragBehavior<any, number, any>;
+  onClick: (index: number, metaKey: boolean) => void;
 };
+
+function stopPropagation(e: any) {
+  e.stopPropagation();
+}
 
 export class InnerComponent extends React.Component<InnerProps, {}> {
   public render() {
@@ -37,7 +42,7 @@ export class InnerComponent extends React.Component<InnerProps, {}> {
       this.props.url === null
         ? this.props.label
         : (
-            <a href={this.props.url} target="#">
+            <a href={this.props.url} target="#" onClick={stopPropagation}>
               {this.props.label}
             </a>
           )
@@ -123,6 +128,7 @@ export class Component extends React.PureComponent<Props, {}> {
       <div
         ref={this.setRef}
         className={"NodeView"}
+        onClick={this.onClick}
         style={style}
       >
         {innerComponent}
@@ -132,6 +138,10 @@ export class Component extends React.PureComponent<Props, {}> {
 
   private setRef = (newRef: HTMLDivElement) => {
     this.ref = newRef;
+  }
+
+  private onClick = (event: React.MouseEvent<any>) => {
+    this.props.onClick(this.props.id, event.metaKey);
   }
 
   private onDoubleClick = () => {
