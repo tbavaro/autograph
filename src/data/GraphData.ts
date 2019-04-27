@@ -29,6 +29,7 @@ export type SerializedNodeV1 = {
   isLocked?: boolean;
   x?: number | null;
   y?: number | null;
+  rank?: number | null;
 };
 
 /**
@@ -150,7 +151,8 @@ const nodeDefaults = DeepReadonly.deepFreeze<Defaults.Defaults<SerializedNode>>(
   color: null,
   isLocked: false,
   x: null,
-  y: null
+  y: null,
+  rank: null
 });
 
 export const documentDefaults = DeepReadonly.deepFreeze<Defaults.Defaults<SerializedDocument>>({

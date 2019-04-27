@@ -10,6 +10,7 @@ const NODE_LABEL_KEY = "label";
 const NODE_SECONDARY_LABEL_KEY = "secondaryLabel";
 const NODE_URL_KEY = "url";
 const NODE_COLOR_KEY = "color";
+const NODE_RANK_KEY = "rank";
 
 const LINKS_SHEET = "links";
 const LINK_SOURCE_ID_KEY = "source";
@@ -39,6 +40,7 @@ export const internals = {
     nodeSecondaryLabels?: string[],
     nodeUrls?: string[],
     nodeColors?: string[],
+    nodeRanks?: string[],
     linkSourceIds: string[],
     linkTargetIds: string[],
     linkStrokes?: string[]
@@ -63,6 +65,11 @@ export const internals = {
 
       if (attrs.nodeUrls !== undefined) {
         result.url = nthIfDefinedElseDefault(attrs.nodeUrls, index, "") || null;
+      }
+
+      if (attrs.nodeRanks !== undefined) {
+        const rankStr = nthIfDefinedElseDefault(attrs.nodeRanks, index, "");
+        result.rank = rankStr === "" ? null : parseFloat(rankStr);
       }
 
       return result;
@@ -105,9 +112,9 @@ export const internals = {
     nodesData: any[][],
     linksData: any[][]
   }) {
-    const [nodeIds, nodeLabels, nodeSecondaryLabels, nodeColors, nodeUrls] = this.extractNamedColumnsToStringArrays(
+    const [nodeIds, nodeLabels, nodeSecondaryLabels, nodeColors, nodeUrls, nodeRanks] = this.extractNamedColumnsToStringArrays(
       attrs.nodesData, [
-        NODE_ID_KEY, NODE_LABEL_KEY, NODE_SECONDARY_LABEL_KEY, NODE_COLOR_KEY, NODE_URL_KEY
+        NODE_ID_KEY, NODE_LABEL_KEY, NODE_SECONDARY_LABEL_KEY, NODE_COLOR_KEY, NODE_URL_KEY, NODE_RANK_KEY
       ]
     );
     const [linkSourceIds, linkTargetIds, linkStrokes] = this.extractNamedColumnsToStringArrays(
@@ -121,6 +128,7 @@ export const internals = {
       nodeSecondaryLabels: nodeSecondaryLabels,
       nodeUrls: nodeUrls,
       nodeColors: nodeColors,
+      nodeRanks: nodeRanks,
       linkSourceIds: assertDefined(linkSourceIds, "linkSourceIds"),
       linkTargetIds: assertDefined(linkTargetIds, "linkTargetIds"),
       linkStrokes: linkStrokes

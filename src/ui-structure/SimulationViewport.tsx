@@ -65,6 +65,12 @@ class FPSView {
 
 function updateForces(simulation: D3.Simulation<any, any>, props: Props) {
   const forceSimulationConfig = props.document.layoutState.forceSimulationConfig;
+
+  const RANK_SEPARATION = 200;
+  const RANK_STRENGTH = 0.5;
+
+  const radiusFunc = (n: MyNodeDatum) => n.rank === null ? 0 : n.rank * RANK_SEPARATION;
+  const radialStrengthFunc = (n: MyNodeDatum) => n.rank === null ? 0 : RANK_STRENGTH;
   simulation
     .force(
       "x",
@@ -80,7 +86,8 @@ function updateForces(simulation: D3.Simulation<any, any>, props: Props) {
         .strength(-1 * forceSimulationConfig.particleCharge)
         .distanceMax(forceSimulationConfig.chargeDistanceMax)
     )
-    .force("links", D3Force.forceLink(props.document.links).distance(forceSimulationConfig.linkDistance));
+    .force("links", D3Force.forceLink(props.document.links).distance(forceSimulationConfig.linkDistance))
+    .force("radial", D3Force.forceRadial(radiusFunc).strength(radialStrengthFunc));
 }
 
 type MySimulation = D3.Simulation<MyNodeDatum, MyLinkDatum>;
