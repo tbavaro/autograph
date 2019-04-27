@@ -131,6 +131,7 @@ export type SerializedLink = SerializedLinkV1;
 const REQUIRED_VALUE = Object.freeze(["<required value>"]) as any;
 
 export type Document = Defaults.DeepRequired<SerializedDocument>;
+export type Node = Defaults.DeepRequired<SerializedNode>;
 export type ZoomState = Document["zoomState"];
 export type DisplayConfig = Document["displayConfig"];
 export type NodeRenderMode = DisplayConfig["nodeRenderMode"];
@@ -141,20 +142,20 @@ const linkDefaults: Defaults.Defaults<SerializedLink> = {
   stroke: DEFAULT_LINK_STROKE
 };
 
+const nodeDefaults = DeepReadonly.deepFreeze<Defaults.Defaults<SerializedNode>>({
+  id: REQUIRED_VALUE,
+  label: REQUIRED_VALUE,
+  secondaryLabel: null,
+  url: null,
+  color: null,
+  isLocked: false,
+  x: null,
+  y: null
+});
+
 export const documentDefaults = DeepReadonly.deepFreeze<Defaults.Defaults<SerializedDocument>>({
   version: 1,
-  nodes: [
-    {
-      id: REQUIRED_VALUE,
-      label: REQUIRED_VALUE,
-      secondaryLabel: null,
-      url: null,
-      color: null,
-      isLocked: false,
-      x: null,
-      y: null
-    }
-  ],
+  nodes: [nodeDefaults],
   links: [
     linkDefaults
   ],
@@ -189,6 +190,10 @@ export function createDefaultDocument(): Document {
 
 export function applyDefaults(sd: SerializedDocument): Document {
   return Defaults.applyDefaults<SerializedDocument>(sd, documentDefaults);
+}
+
+export function applyNodeDefaults(n: SerializedNode): Node {
+  return Defaults.applyDefaults<SerializedNode>(n, nodeDefaults);
 }
 
 export function load<T extends { version?: number, [key: string]: any }>(

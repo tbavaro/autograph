@@ -1,7 +1,7 @@
 import { NodeSearchHelper } from "../util/SearchUtils";
 
 import * as GraphData from "./GraphData";
-import { MyLinkDatum, MyNodeDatum } from "./MyNodeDatum";
+import { MyLinkDatum, MyNodeDatum, nodeDatumFromGraphNode } from "./MyNodeDatum";
 
 // TODO move merge logic out of here, now that the data is separated
 export const internals = {
@@ -139,20 +139,7 @@ export class GraphDocument {
 
     const idToNodeMap = new Map<string, MyNodeDatum>();
     this.nodes = this.data.nodes.map(sn => {
-      const node: MyNodeDatum = {
-        id: sn.id,
-        label: sn.label,
-        secondaryLabel: sn.secondaryLabel,
-        url: sn.url,
-        isLocked: sn.isLocked,
-        color: sn.color,
-        x: (sn.x === null ? undefined : sn.x),
-        y: (sn.y === null ? undefined : sn.y)
-      };
-      if (node.isLocked) {
-        node.fx = node.x;
-        node.fy = node.y;
-      }
+      const node: MyNodeDatum = nodeDatumFromGraphNode(sn);
       idToNodeMap.set(node.id, node);
       return node;
     });

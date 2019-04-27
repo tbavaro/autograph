@@ -1,5 +1,7 @@
-import { MyNodeDatum } from "../data/MyNodeDatum";
+import * as GraphData from "../data/GraphData";
+import { MyNodeDatum, nodeDatumFromGraphNode } from "../data/MyNodeDatum";
 import { NodeSearchHelper } from "./SearchUtils";
+
 
 type LabelOrLabelAndSecondaryLabel = (string | [string, string]);
 
@@ -26,13 +28,11 @@ function testNodeSearch(attrs: {
         secondaryLabel = null;
       }
 
-      return {
+      return nodeDatumFromGraphNode(GraphData.applyNodeDefaults({
         id: id,
         label: primaryLabel,
         secondaryLabel: secondaryLabel,
-        url: null,
-        isLocked: false
-      };
+      }));
     });
 
     const helper = new NodeSearchHelper(nodes);
