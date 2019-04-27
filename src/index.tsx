@@ -6,6 +6,9 @@ import "./index.css";
 import * as registerServiceWorker from "./registerServiceWorker";
 
 console.log(`Autograph version ${process.env.REACT_APP_VERSION}`);
+document.addEventListener("gesturestart", (e: any) => {
+  e.preventDefault();
+});
 ReactDOM.render(
   <App />,
   document.getElementById("root") as HTMLElement

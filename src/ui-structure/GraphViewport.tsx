@@ -1,4 +1,4 @@
-import * as D3 from "d3";
+import { drag as D3Drag } from "d3-drag";
 import * as React from "react";
 import "./GraphViewport.css";
 
@@ -75,7 +75,7 @@ export class Component extends React.PureComponent<Props, State> {
   private linksViewRef: SVGLinesComponent | null = null;
   private svgRef: SVGGElement | null = null;
   private nodeRefs: Array<NodeView | null> = [];
-  private drag = D3.drag<any, any, number>();
+  private drag = D3Drag<any, any, number>();
 
   private nodeActionManager: NodeActionManager = {
     onNodeMoved: (index: number, x: number, y: number, stopped: boolean) => {

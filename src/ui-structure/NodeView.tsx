@@ -1,5 +1,6 @@
 import * as classNames from "classnames";
-import * as D3 from "d3";
+import { DragBehavior as D3DragBehavior } from "d3-drag";
+import { select as D3Select } from "d3-selection";
 import * as React from "react";
 
 import "./NodeView.css";
@@ -28,7 +29,7 @@ type Props = SharedProps & {
   id: number;
   initialX: number;
   initialY: number;
-  dragBehavior?: D3.DragBehavior<any, number, any>;
+  dragBehavior?: D3DragBehavior<any, number, any>;
   onClick: (index: number, metaKey: boolean) => void;
 };
 
@@ -61,6 +62,7 @@ export class InnerComponent extends React.Component<InnerProps, {}> {
             "selected": this.props.isSelected
           }
         )}
+        onTouchStartCapture={this.onTouchStart}
         onDoubleClick={this.props.onDoubleClick}
       >
         {
@@ -75,6 +77,23 @@ export class InnerComponent extends React.Component<InnerProps, {}> {
         }
       </div>
     );
+  }
+
+  private touchStartedRecently = false;
+  private onTouchStart = (event: React.SyntheticEvent<any, any>): boolean | undefined => {
+    alert("touch started");
+    if (!this.touchStartedRecently) {
+      this.touchStartedRecently = true;
+      setTimeout(() => { this.touchStartedRecently = false; }, 600);
+      return true;
+    } else {
+      event.preventDefault();
+      alert("double click");
+      if (this.props.onDoubleClick) {
+        this.props.onDoubleClick();
+      }
+      return undefined;
+    }
   }
 }
 
@@ -94,7 +113,7 @@ export class Component extends React.PureComponent<Props, {}> {
       throw new Error("ref not set");
     }
 
-    const sel = D3.select(this.ref);
+    const sel = D3Select(this.ref);
     sel.datum(this.props.id);
 
     if (this.props.dragBehavior) {
@@ -105,7 +124,7 @@ export class Component extends React.PureComponent<Props, {}> {
   public componentWillReceiveProps(newProps: Readonly<Props>, nextContext: any) {
     // clear old drag behavior if it's changing
     if (this.ref && this.props.dragBehavior !== newProps.dragBehavior) {
-      D3.select(this.ref).on(".drag", null);
+      D3Select(this.ref).on(".drag", null);
     }
 
     if (newProps.initialX !== this.props.initialX || newProps.initialY !== this.props.initialY) {
