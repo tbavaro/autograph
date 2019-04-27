@@ -536,6 +536,7 @@ class App extends React.Component<{}, State> {
         document.nodes.forEach(node => {
           node.fx = undefined;
           node.fy = undefined;
+          node.isLocked = false;
         });
         this.simulationConfigListener.triggerListeners();
       }
