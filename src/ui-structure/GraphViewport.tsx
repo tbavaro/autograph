@@ -98,6 +98,7 @@ export class Component extends React.PureComponent<Props, State> {
       node.fx = (node.isLocked ? node.x : undefined);
       node.fy = (node.isLocked ? node.y : undefined);
       this.onChange([index]);
+      this.forceUpdate();
     }
   };
 
