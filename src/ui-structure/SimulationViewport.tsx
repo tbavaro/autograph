@@ -81,7 +81,11 @@ function updateForces(simulation: D3.Simulation<any, any>, props: Props) {
         .strength(-1 * forceSimulationConfig.particleCharge)
         .distanceMax(forceSimulationConfig.chargeDistanceMax)
     )
-    .force("links", D3Force.forceLink(props.document.links).distance(forceSimulationConfig.linkDistance));
+    .force(
+      "links",
+      D3Force.forceLink(props.document.links)
+        .distance(forceSimulationConfig.linkDistance)
+    );
 
   const RADIAL_FORCE_NAME = "radial";
   if (forceSimulationConfig.radialRankStrength > 0.0001) {
