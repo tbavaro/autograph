@@ -201,6 +201,23 @@ class PropertiesDrawerContents extends React.Component<Props, State> {
           maxValue={1000}
           setValue={this.props.actions.setSimulationProperty}
         />
+        <MySliderListItem
+          label="Radial rank separation"
+          object={values}
+          field={"radialRankSeparation"}
+          formatter={ValueFormatters.roundedInt}
+          maxValue={1000}
+          setValue={this.props.actions.setSimulationProperty}
+        />
+        <MySliderListItem
+          label="Radial rank strength"
+          object={values}
+          field={"radialRankStrength"}
+          formatter={FORMATTER_PRECISION_5}
+          maxValue={1.0}
+          exponent={2}
+          setValue={this.props.actions.setSimulationProperty}
+        />
       </List>
     );
   }

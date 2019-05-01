@@ -76,6 +76,8 @@ export type SerializedLayoutStateV1 = {
     particleCharge?: number;
     chargeDistanceMax?: number;
     linkDistance?: number;
+    radialRankSeparation?: number;
+    radialRankStrength?: number;
   };
 };
 
@@ -172,7 +174,9 @@ export const documentDefaults = DeepReadonly.deepFreeze<Defaults.Defaults<Serial
       originPullStrength: DEFAULT_ORIGIN_PULL_STRENGTH,
       particleCharge: DEFAULT_PARTICLE_CHARGE,
       chargeDistanceMax: DEFAULT_CHARGE_DISTANCE_MAX,
-      linkDistance: DEFAULT_LINK_DISTANCE
+      linkDistance: DEFAULT_LINK_DISTANCE,
+      radialRankSeparation: 100,
+      radialRankStrength: 0
     }
   },
   displayConfig: {
