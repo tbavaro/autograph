@@ -151,8 +151,9 @@ export class Component extends React.PureComponent<Props, {}> {
   }
 
   private updateStyleForPosition(style: React.CSSProperties | CSSStyleDeclaration) {
-    style.left = `${this.x}px`;
-    style.top = `${this.y}px`;
+    // style.left = `${this.x}px`;
+    // style.top = `${this.y}px`;
+    style.transform = `translate(${this.x}px, ${this.y}px)`;
   }
 
   public setPosition(x: number, y: number) {
