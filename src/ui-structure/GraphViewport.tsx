@@ -195,7 +195,7 @@ export class Component extends React.PureComponent<Props, State> {
   }
 
   private onDrag = (index: number, dx: number, dy: number, isEnd: boolean) => {
-    if (dx === 0 && dy === 0 && !isEnd) {
+    if (dx === 0 && dy === 0) {
       return;
     }
 
@@ -205,6 +205,11 @@ export class Component extends React.PureComponent<Props, State> {
     }
     indexes.forEach(i => {
       const node = this.props.nodes[i];
+
+      if (dx !== 0 || dy !== 0) {
+        node.isLocked = true;
+      }
+
       node.x = (node.x || 0) + dx;
       node.y = (node.y || 0) + dy;
       if (isEnd && !node.isLocked) {
