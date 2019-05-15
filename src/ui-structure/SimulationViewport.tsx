@@ -12,6 +12,8 @@ import { ListenableSimulationWrapper } from "../ListenableSimulation";
 import * as GraphViewport from "./GraphViewport";
 import { ListenerBinding, ListenerPureComponent } from "./ListenerPureComponent";
 
+const INITIAL_LOAD_ALPHA = 0;
+
 export interface Props {
   document: GraphDocument;
   simulationConfigListener: SimpleListenable;
@@ -138,6 +140,7 @@ export class Component extends ListenerPureComponent<Props, State> {
     this.initializeSimulation(this.props.document);
     this.simulationWrapper.addListener("tick", this.onSimulationTick);
     updateForces(this.simulation, this.props);
+    this.restartSimulation(INITIAL_LOAD_ALPHA);
   }
 
   public componentWillUnmount() {
@@ -155,7 +158,7 @@ export class Component extends ListenerPureComponent<Props, State> {
       this.initializeSimulation(newProps.document);
       updateForces(this.simulation, newProps);
       this.setState({ isPaused: false });
-      this.restartSimulation();
+      this.restartSimulation(/*alpha=*/INITIAL_LOAD_ALPHA);
     }
   }
 
@@ -182,11 +185,15 @@ export class Component extends ListenerPureComponent<Props, State> {
     }
   }
 
-  private restartSimulation = () => {
-    this.simulation.alpha(1);
+  private restartSimulation = (alpha?: number) => {
+    this.simulation.alpha(alpha === undefined ? 1 : alpha);
     if (!this.state.isPaused) {
       this.simulation.restart();
     }
+  }
+
+  public repositionNodes() {
+    this.restartSimulation(/*alpha=1*/);
   }
 
   private onSimulationTick = () => {

@@ -394,6 +394,9 @@ class App extends React.Component<{}, State> {
         if (merged) {
           this.showSnackbarMessage("Updated data successfully");
         }
+        if (this.simulationViewportRef) {
+          this.simulationViewportRef.repositionNodes();
+        }
       })
     )
   }
