@@ -90,11 +90,7 @@ export const internals = {
       if (attrs.linkStrokes !== undefined) {
         const linkStroke = nthIfDefinedElseDefault(attrs.linkStrokes, index, "") || undefined;
         if (linkStroke !== undefined) {
-          try {
-            result.stroke = GraphData.validateLinkStroke(linkStroke);
-          } catch (e) {
-            // TODO record errors
-          }
+          result.stroke = linkStroke as GraphData.LinkStroke;
         }
       }
 

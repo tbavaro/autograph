@@ -1,9 +1,5 @@
-import { createValidationFunction } from "tsvalidators";
-
 import * as DeepReadonly from "./DeepReadonly";
 import * as Defaults from "./Defaults";
-
-import * as GraphDataValidators from "../generated/GraphDataValidators";
 
 export type Id = string;
 
@@ -41,12 +37,6 @@ export type LinkStroke = (
 );
 
 export const DEFAULT_LINK_STROKE: LinkStroke = "solid";
-
-export const validateLinkStroke =
-  createValidationFunction<LinkStroke>(
-    GraphDataValidators.validatorForLinkStroke,
-    "LinkStroke"
-  );
 
 /**
  * @autogents validator
@@ -116,12 +106,6 @@ export type SerializedDocumentV1 = {
   displayConfig?: SerializedDisplayConfigV1;
   dataSource?: SerializedDataSourceV1;
 };
-
-export const validateDocumentV1 =
-  createValidationFunction<SerializedDocumentV1>(
-    GraphDataValidators.validatorForSerializedDocumentV1,
-    "SerializedDocumentV1"
-  );
 
 /**
  * Latest version
@@ -210,7 +194,7 @@ export function load<T extends { version?: number, [key: string]: any }>(
   switch (input.version) {
     case undefined:
     case 1: {
-      const inputDocumentV1 = validateDocumentV1(input);
+      const inputDocumentV1 = input as SerializedDocumentV1;
       inputDocument = upgradeV1(inputDocumentV1);
       break;
     }

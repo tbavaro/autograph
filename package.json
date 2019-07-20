@@ -12,8 +12,7 @@
     "fuse.js": "^3.4.4",
     "query-string": "^6.4.2",
     "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "tsvalidators": "github:tbavaro/tsvalidators#dist"
+    "react-dom": "^16.8.6"
   },
   "scripts": {
     "build:css": "node-sass src/ -o src/ ",
@@ -25,7 +24,6 @@
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "codegen": "./node_modules/.bin/generate-validators --output src/generated/GraphDataValidators.ts src/data/GraphData.ts",
     "push": "./node_modules/.bin/tsdevtools deploy --branch gh-pages --subtreeDir build",
     "pushbeta": "./node_modules/.bin/tsdevtools deploy --branch gh-pages-beta --subtreeDir build --version-bump beta && git fetch origin gh-pages gh-pages-beta && git checkout gh-pages-beta && git checkout gh-pages && rm -rf beta && git clone .git beta --branch gh-pages-beta --single-branch && rm -rf beta/.git && git add -A beta && git commit -m \"beta\" && git push && git checkout master && git branch -D gh-pages gh-pages-beta"
   },
@@ -42,10 +40,9 @@
     "@types/query-string": "^6.3.0",
     "@types/react": "^16.8.12",
     "@types/react-dom": "^16.8.3",
-    "autogents": "github:tbavaro/autogents#dist",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.12.0",
     "npm-run-all": "^4.1.5",
-    "react-scripts-ts": "3.1.0",
+    "react-scripts-ts": "^3.1.0",
     "source-map-explorer": "^1.8.0",
     "tsdevtools": "github:tbavaro/tsdevtools#dist",
     "typescript": "^3.4.2"
