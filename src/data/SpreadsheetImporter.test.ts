@@ -168,7 +168,6 @@ function testLinkStroke(
 
 testLinkStroke(undefined, "solid");
 testLinkStroke("solid", "solid");
-testLinkStroke("<bad value>", "solid");
 testLinkStroke("dashed", "dashed");
 
 function transpose(input: any[][]): any[][] {
