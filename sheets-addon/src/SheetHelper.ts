@@ -59,7 +59,7 @@ export default class SheetHelper {
     this.sheet = sheet;
   }
 
-  public extractColumns<EO extends ExtractionOptions>(options: EO): {
+  public readColumnData<EO extends ExtractionOptions>(options: EO): {
     [ header in keyof EO ]?: Array<(EO[header]["transform"] extends ValueTransform<infer T> ? T : unknown)>
   } {
     const keys = Object.keys(options);
@@ -171,7 +171,7 @@ export default class SheetHelper {
     });
   }
 
-  public writeColumns(data: Array<{
+  public writeColumnData(data: Array<{
     header: string;
     values: any[];
   }>) {

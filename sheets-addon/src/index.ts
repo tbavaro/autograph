@@ -15,7 +15,7 @@ const viewInAutograph = registerGlobalFunction(() => {
   const managedSheet = new AutographManagedSheet(sheet);
 
   const sheetHelper = new SheetHelper(sheet);
-  const values = sheetHelper.extractColumns({
+  const values = sheetHelper.readColumnData({
     aValues: {
       header: "a",
       transform: SheetHelperTransforms.asString
@@ -41,7 +41,7 @@ const viewInAutograph = registerGlobalFunction(() => {
   for (let i = 0; i < numValues; ++i) {
     valuesToWrite.push(`value#${i}`);
   }
-  sheetHelper.writeColumns([
+  sheetHelper.writeColumnData([
     {
       header: "write1",
       values: [

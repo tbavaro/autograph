@@ -29,7 +29,7 @@ export default class AutographManagedSheet {
   public loadData(): LoadedData {
     const autographConfig = this.loadAutographConfig();
 
-    const values = this.helper.extractColumns({
+    const values = this.helper.readColumnData({
       nodeIds: {
         header: HEADER_NODE_ID,
         transform: SheetHelperTransforms.asString
