@@ -1,4 +1,4 @@
-import SheetHelper from "./SheetHelper";
+import SheetHelper, { SheetHelperTransforms } from "./SheetHelper";
 
 global.onOpen = () => {
   const ui = SpreadsheetApp.getUi();
@@ -18,5 +18,9 @@ const viewInAutograph = registerGlobalFunction(() => {
   const sheet = new SheetHelper(SpreadsheetApp.getActiveSheet());
 
   const ui = SpreadsheetApp.getUi();
-  ui.alert(JSON.stringify(sheet.extractColumns(["a", "b", "d"]), null, 2));
+  const values = sheet.extractColumns({
+    a: SheetHelperTransforms.asString,
+    b: SheetHelperTransforms.asNumberOrNull
+  });
+  ui.alert(JSON.stringify(values, null, 2));
 });

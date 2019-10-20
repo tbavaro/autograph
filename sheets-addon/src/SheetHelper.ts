@@ -1,12 +1,36 @@
 type Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 
-// type ValueTransform<T> = (value: string) => T | undefined;
+type ValueTransform<T> = (value: any) => T;
 
-// const stringValueTransform: ValueTransform<string> = v => (v === "" ? undefined : v);
+const stringValueTransform: ValueTransform<string> = (v: string) => {
+  if (typeof v === "string") {
+    return v;
+  } else if (v === null || v === undefined) {
+    return "";
+  } else {
+    return `${v}`;
+  }
+};
 
-// type ExtractionOptions = {
-//   [ header: string ]: ValueTransform<unknown>
-// };
+const numberValueTransform: ValueTransform<number | null> = (v: string) => {
+  if (typeof v === "number") {
+    return v;
+  } else if (v === null || v === undefined || v === "") {
+    return null;
+  } else {
+    return parseFloat(`${v}`);
+  }
+};
+
+export const SheetHelperTransforms = {
+  asString: stringValueTransform,
+  asNumberOrNull: numberValueTransform
+};
+
+// tslint:disable-next-line: interface-over-type-literal
+type ExtractionOptions = {
+  [ header: string ]: ValueTransform<unknown>
+};
 
 function trimValues(values: any[]): any[] {
   let i = values.length;
@@ -27,7 +51,24 @@ export default class SheetHelper {
     this.sheet = sheet;
   }
 
-  public extractColumns(headers: string[]): Array<any[] | null> {
+  public extractColumns<EO extends ExtractionOptions>(options: EO): {
+    [ header in keyof EO ]?: Array<(EO[header] extends ValueTransform<infer T> ? T : unknown)>
+  } {
+    const headers = Object.keys(options);
+    const columnsValuesRaw = this.extractColumnsRaw(headers);
+
+    const result: any = {};
+    columnsValuesRaw.forEach((values, i) => {
+      if (values !== null) {
+        const header = headers[i];
+        const transform = options[header];
+        result[header] = values.map(transform);
+      }
+    });
+    return result;
+  }
+
+  public extractColumnsRaw(headers: string[]): Array<any[] | null> {
     const headerRow = 1;
     const firstDataRow = headerRow + 1;
     const lastRow = this.sheet.getLastRow();
@@ -69,5 +110,10 @@ export default class SheetHelper {
       return (idx === -1 ? null : startColumn + idx);
     });
   }
-
 }
+
+// const s = new SheetHelper(SpreadsheetApp.getActiveSheet());
+// const resultv = s.extractColumns({
+//   a: stringValueTransform,
+//   b: numberValueTransform
+// });
