@@ -5,6 +5,7 @@
     "outDir": "./dist",
     "alwaysStrict": true,
     "strict": true,
+    "strictNullChecks": true,
     "lib": ["esnext"],
     "experimentalDecorators": true,
     "baseUrl": "./"

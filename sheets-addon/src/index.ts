@@ -1,3 +1,5 @@
+import SheetHelper from "./SheetHelper";
+
 global.onOpen = () => {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu("Scripts")
@@ -13,6 +15,8 @@ export function registerGlobalFunction(func: () => void): string {
 }
 
 const viewInAutograph = registerGlobalFunction(() => {
+  const sheet = new SheetHelper(SpreadsheetApp.getActiveSheet());
+
   const ui = SpreadsheetApp.getUi();
-  ui.alert("ok!");
+  ui.alert(JSON.stringify(sheet.extractColumns(["a", "b", "d"]), null, 2));
 });
