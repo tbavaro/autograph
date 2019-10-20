@@ -1,6 +1,5 @@
 const GasPlugin = require('gas-webpack-plugin');
 const es3ifyPlugin = require('es3ify-webpack-plugin');
-const path = require("path");
 
 module.exports = {
   // devtool: 'inline-source-map',
