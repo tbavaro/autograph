@@ -1,4 +1,5 @@
-import { showPreformattedDialog } from "./GoogleAppsHelpers";
+import AutographManagedSheet from "./AutographManagedSheet";
+import { registerGlobalFunction, showPreformattedDialog } from "./GoogleAppsHelpers";
 import SheetHelper, { SheetHelperTransforms } from "./SheetHelper";
 
 global.onOpen = () => {
@@ -8,21 +9,24 @@ global.onOpen = () => {
     .addToUi();
 };
 
-let menuFuncCounter = 0;
-export function registerGlobalFunction(func: () => void): string {
-  const funcName = `myGlobalFunc${menuFuncCounter++}`;
-  (global as any)[funcName] = func;
-  return funcName;
-}
-
 const viewInAutograph = registerGlobalFunction(() => {
-  const sheet = new SheetHelper(SpreadsheetApp.getActiveSheet());
+  const sheet = SpreadsheetApp.getActiveSheet();
 
-  const ui = SpreadsheetApp.getUi();
-  const values = sheet.extractColumns({
-    a: SheetHelperTransforms.asString,
-    b: SheetHelperTransforms.asNumberOrNull
+  const managedSheet = new AutographManagedSheet(sheet);
+  managedSheet.createAutographConfigColumnIfNeeded();
+
+  const sheetHelper = new SheetHelper(sheet);
+  const values = sheetHelper.extractColumns({
+    aValues: {
+      header: "a",
+      transform: SheetHelperTransforms.asString
+    },
+    bValues: {
+      header: "b",
+      transform: SheetHelperTransforms.asNumberOrNull
+    }
   });
-
+  
+  const ui = SpreadsheetApp.getUi();
   showPreformattedDialog(ui, JSON.stringify(values, null, 2));
 });

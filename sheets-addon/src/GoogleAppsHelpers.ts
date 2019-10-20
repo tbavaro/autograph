@@ -17,3 +17,10 @@ export function showPreformattedDialog(ui: GoogleAppsScript.Base.Ui, content: st
   html.setHeight(800);
   ui.showModalDialog(html, title || "Dialog");
 }
+
+let menuFuncCounter = 0;
+export function registerGlobalFunction(func: () => void): string {
+  const funcName = `myGlobalFunc${menuFuncCounter++}`;
+  (global as any)[funcName] = func;
+  return funcName;
+}

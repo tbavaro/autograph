@@ -7,6 +7,8 @@
     "rules": {
         "arrow-parens": false,
         "interface-name": [true, "never-prefix"],
+        "max-classes-per-file": false,
+        "member-ordering": false,
         "no-trailing-whitespace": false,
         "object-literal-sort-keys": false,
         "trailing-comma": false

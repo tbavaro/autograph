@@ -30,7 +30,10 @@ export const SheetHelperTransforms = {
 
 // tslint:disable-next-line: interface-over-type-literal
 type ExtractionOptions = {
-  [ header: string ]: ValueTransform<unknown>
+  [ key: string ]: {
+    header: string;
+    transform: ValueTransform<unknown>;
+  }
 };
 
 function trimValues(values: any[]): any[] {
@@ -53,23 +56,46 @@ export default class SheetHelper {
   }
 
   public extractColumns<EO extends ExtractionOptions>(options: EO): {
-    [ header in keyof EO ]?: Array<(EO[header] extends ValueTransform<infer T> ? T : unknown)>
+    [ header in keyof EO ]?: Array<(EO[header]["transform"] extends ValueTransform<infer T> ? T : unknown)>
   } {
-    const headers = Object.keys(options);
+    const keys = Object.keys(options);
+    const headers = keys.map(key => options[key].header);
     const columnsValuesRaw = this.extractColumnsRaw(headers);
 
     const result: any = {};
     columnsValuesRaw.forEach((values, i) => {
       if (values !== null) {
+        const key = keys[i];
         const header = headers[i];
-        const transform = options[header];
-        result[header] = values.map(transform);
+        const transform = options[key].transform;
+        result[key] = values.map(transform);
       }
     });
     return result;
   }
 
-  public extractColumnsRaw(headers: string[]): Array<any[] | null> {
+  public findColumns(
+    headers: string[],
+    headerRow: number
+  ): Array<number | null> {
+    const startColumn = 1;
+    const numColumns = this.sheet.getLastColumn() - startColumn + 1;
+
+    let values: Array<string | null>;
+    if (numColumns < 1) {
+      values = [];
+    } else {
+      const range = this.sheet.getRange(headerRow, startColumn, 1, numColumns);
+      values = range.getValues()[0];
+    }
+
+    return headers.map(header => {
+      const idx = values.indexOf(header);
+      return (idx === -1 ? null : startColumn + idx);
+    });
+  }
+
+  private extractColumnsRaw(headers: string[]): Array<any[] | null> {
     const headerRow = 1;
     const firstDataRow = headerRow + 1;
     const lastRow = this.sheet.getLastRow();
@@ -88,27 +114,6 @@ export default class SheetHelper {
       const range = this.sheet.getRange(firstDataRow, idx, maxNumDataRows, 1);
       const values = range.getValues().map(row => (row.length === 0 ? null : row[0]));
       return trimValues(values);
-    });
-  }
-
-  private findColumns(
-    headers: string[],
-    headerRow: number
-  ): Array<number | null> {
-    const startColumn = 1;
-    const numColumns = this.sheet.getLastColumn() - startColumn + 1;
-
-    let values: Array<string | null>;
-    if (numColumns < 1) {
-      values = [];
-    } else {
-      const range = this.sheet.getRange(headerRow, startColumn, 1, numColumns);
-      values = range.getValues()[0];
-    }
-
-    return headers.map(header => {
-      const idx = values.indexOf(header);
-      return (idx === -1 ? null : startColumn + idx);
     });
   }
 }
