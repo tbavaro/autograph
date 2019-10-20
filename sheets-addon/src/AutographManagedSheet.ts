@@ -3,78 +3,73 @@ import { findInArray } from "./util";
 
 type Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 
-const MANAGED_COLUMN_BACKGROUND_COLOR = "#aaaaaa";
+const METADATA_KEY_AUTOGRAPH_CONFIG = "autograph.config";
 
-const HEADER_AUTOGRAPH_CONFIG = "autograph.config";
+const HEADER_NODE_ID = "node.id";
 
-type AutographConfig = string;
+interface AutographConfig {
+  lastModifiedDate?: string;
+  appData?: string;
+}
 
 interface LoadedData {
-  autographConfig?: AutographConfig;
+  autographConfig: AutographConfig;
+  nodeIds?: string[];
 }
 
 export default class AutographManagedSheet {
   public readonly sheet: Sheet;
   private readonly helper: SheetHelper;
-  private loadedData: LoadedData | undefined;
 
   constructor(sheet: Sheet) {
     this.sheet = sheet;
     this.helper = new SheetHelper(sheet);
   }
 
-  public reloadData() {
+  public loadData(): LoadedData {
+    const autographConfig = this.loadAutographConfig();
+
     const values = this.helper.extractColumns({
-      autographConfig: {
-        header: HEADER_AUTOGRAPH_CONFIG,
+      nodeIds: {
+        header: HEADER_NODE_ID,
         transform: SheetHelperTransforms.asString
       }
     });
 
-    Logger.log("values: " + JSON.stringify(values));
-
-    let autographConfig: string | undefined;
-    if (values.autographConfig) {
-      autographConfig = findInArray(values.autographConfig, v => !!v) || "";
-    }
-
-    this.loadedData = {
-      autographConfig
+    return {
+      autographConfig,
+      nodeIds: values.nodeIds
     };
-
-    Logger.log("loaded data: " + JSON.stringify(this.loadedData));
   }
 
-  private invalidateLoadedData() {
-    this.loadedData = undefined;
-  }
+  private getOrCreateAutographConfigMetadata(): GoogleAppsScript.Spreadsheet.DeveloperMetadata {
+    const metadata = this.sheet.getDeveloperMetadata();
+    // metadata.forEach(m => {
+    //   Logger.log(JSON.stringify({
+    //     key: m.getKey(),
+    //     value: m.getValue()
+    //   }));
+    // });
 
-  private loadDataIfNeeded(): LoadedData {
-    if (this.loadedData === undefined) {
-      this.reloadData();
-      if (this.loadedData === undefined) {
-        throw new Error();
-      }
+    const configMetadata = findInArray(metadata, m => m.getKey() === METADATA_KEY_AUTOGRAPH_CONFIG);
+    if (configMetadata !== undefined) {
+      return configMetadata;
     }
-    return this.loadedData;
+    this.sheet.addDeveloperMetadata(METADATA_KEY_AUTOGRAPH_CONFIG, "{}");
+    return this.getOrCreateAutographConfigMetadata();
   }
 
-  public hasAutographConfigColumn(): boolean {
-    return this.loadDataIfNeeded().autographConfig !== undefined;
+  public loadAutographConfig(): AutographConfig {
+    return JSON.parse(this.getOrCreateAutographConfigMetadata().getValue());
   }
 
-  public createAutographConfigColumnIfNeeded() {
-    if (!this.hasAutographConfigColumn()) {
-      this.sheet.insertColumnBefore(1);
-      const column = this.sheet.getRange(1, 1, this.sheet.getMaxRows(), 1);
-      this.sheet.hideColumn(column);
-      column.setBackground(MANAGED_COLUMN_BACKGROUND_COLOR);
-      column.setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
-      const headerCell = column.offset(0, 0, 1, 1);
-      headerCell.setValue(HEADER_AUTOGRAPH_CONFIG);
-      headerCell.setFontWeight("bold");
-      headerCell.setNote("Automatically managed by the Autograph application. DO NOT EDIT.");
-      this.invalidateLoadedData();
-    }
+  private saveAutographConfig(config: AutographConfig) {
+    this.getOrCreateAutographConfigMetadata().setValue(JSON.stringify(config));
+  }
+
+  public updateAutographConfig(transform: (prevConfig: AutographConfig) => AutographConfig | void) {
+    const prevConfig = this.loadAutographConfig();
+    const newConfig = transform(prevConfig) || prevConfig;
+    this.saveAutographConfig(newConfig);
   }
 }

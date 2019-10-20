@@ -1,3 +1,5 @@
+import { findDuplicates, arrayHasNoNulls, uniqueValues, forEachReverse } from "./util";
+
 type Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 
 type ValueTransform<T> = (value: any) => T;
@@ -74,7 +76,7 @@ export default class SheetHelper {
     return result;
   }
 
-  public findColumns(
+  private findColumns(
     headers: string[],
     headerRow: number
   ): Array<number | null> {
@@ -93,6 +95,42 @@ export default class SheetHelper {
       const idx = values.indexOf(header);
       return (idx === -1 ? null : startColumn + idx);
     });
+  }
+
+  private findOrCreateColumns(
+    headers: string[],
+    headerRow: number
+  ): number[] {
+    const findResult = this.findColumns(headers, headerRow);
+
+    const missingHeaders: string[] = [];
+    findResult.forEach((columnIdx, i) => {
+      if (columnIdx === null) {
+        missingHeaders.push(headers[i]);
+      }
+    });
+
+    // if we aren't missing anything, then we're done
+    if (missingHeaders.length === 0) {
+      return findResult as number[];
+    }
+
+    this.createColumns(uniqueValues(missingHeaders), headerRow);
+    return this.findOrCreateColumns(headers, headerRow);
+  }
+
+  private createColumns(
+    headers: string[],
+    headerRow: number
+  ) {
+    forEachReverse(headers, header => this.createColumn(header, headerRow));
+  }
+
+  private createColumn(
+    header: string,
+    headerRow: number
+  ) {
+    // XCXC
   }
 
   private extractColumnsRaw(headers: string[]): Array<any[] | null> {
@@ -115,6 +153,22 @@ export default class SheetHelper {
       const values = range.getValues().map(row => (row.length === 0 ? null : row[0]));
       return trimValues(values);
     });
+  }
+
+  public writeColumns(data: Array<{
+    header: string;
+    values: any[];
+  }>) {
+    const headers = data.map(d => d.header);
+    const duplicateHeaders = findDuplicates(headers);
+    if (duplicateHeaders.length !== 0) {
+      throw new Error(`duplicate headers: ${JSON.stringify(duplicateHeaders)}`);
+    }
+
+    let 
+
+    const maxNumValues = Math.max.apply(Math, data.map(d => d.values.length));
+
   }
 }
 
