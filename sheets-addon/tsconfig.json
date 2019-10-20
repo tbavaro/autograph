@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "alwaysStrict": true,
+    "strict": true,
+    "lib": ["esnext"],
+    "experimentalDecorators": true,
+    "baseUrl": "./"
+  },
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+    "../tsconfig.json",
+    "../node_modules/**/*"
+  ]
+}
