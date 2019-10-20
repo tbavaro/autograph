@@ -2,7 +2,7 @@ type Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 
 type ValueTransform<T> = (value: any) => T;
 
-const stringValueTransform: ValueTransform<string> = (v: string) => {
+const stringValueTransform: ValueTransform<string> = (v: any) => {
   if (typeof v === "string") {
     return v;
   } else if (v === null || v === undefined) {
@@ -12,7 +12,8 @@ const stringValueTransform: ValueTransform<string> = (v: string) => {
   }
 };
 
-const numberValueTransform: ValueTransform<number | null> = (v: string) => {
+// NB: will be NaN if non-empty string that's not parseable as a number
+const numberValueTransform: ValueTransform<number | null> = (v: any) => {
   if (typeof v === "number") {
     return v;
   } else if (v === null || v === undefined || v === "") {

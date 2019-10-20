@@ -1,3 +1,4 @@
+import { showPreformattedDialog } from "./GoogleAppsHelpers";
 import SheetHelper, { SheetHelperTransforms } from "./SheetHelper";
 
 global.onOpen = () => {
@@ -22,5 +23,6 @@ const viewInAutograph = registerGlobalFunction(() => {
     a: SheetHelperTransforms.asString,
     b: SheetHelperTransforms.asNumberOrNull
   });
-  ui.alert(JSON.stringify(values, null, 2));
+
+  showPreformattedDialog(ui, JSON.stringify(values, null, 2));
 });
