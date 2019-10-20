@@ -34,9 +34,9 @@ export function uniqueValues<T>(arr: ReadonlyArray<T>): T[] {
   return findDuplicatesOrUniqueValues(arr, /*isFindDuplicates=*/false);
 }
 
-export function forEachReverse<T>(arr: ReadonlyArray<T>, func: (value: T) => void) {
-  // tslint:disable-next-line: prefer-for-of
-  for (let i = arr.length - 1; i >= 0; --i) {
-    func(arr[i]);
-  }
-}
+// export function forEachReverse<T>(arr: ReadonlyArray<T>, func: (value: T) => void) {
+//   // tslint:disable-next-line: prefer-for-of
+//   for (let i = arr.length - 1; i >= 0; --i) {
+//     func(arr[i]);
+//   }
+// }

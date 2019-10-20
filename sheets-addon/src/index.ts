@@ -35,4 +35,20 @@ const viewInAutograph = registerGlobalFunction(() => {
   managedSheet.updateAutographConfig(c => {
     c.lastModifiedDate = `${new Date()}`;
   });
+
+  const numValues = Math.floor(Math.random() * 1000);
+  const valuesToWrite = [];
+  for (let i = 0; i < numValues; ++i) {
+    valuesToWrite.push(`value#${i}`);
+  }
+  sheetHelper.writeColumns([
+    {
+      header: "write1",
+      values: [
+        new Date(),
+        `expect ${numValues} values`,
+        ...valuesToWrite
+      ]
+    }
+  ]);
 });

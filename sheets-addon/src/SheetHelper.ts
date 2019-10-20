@@ -1,8 +1,10 @@
-import { findDuplicates, arrayHasNoNulls, uniqueValues, forEachReverse } from "./util";
+import { findDuplicates, uniqueValues } from "./util";
 
 type Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 
 type ValueTransform<T> = (value: any) => T;
+
+const DEFAULT_HEADER_ROW = 1;
 
 const stringValueTransform: ValueTransform<string> = (v: any) => {
   if (typeof v === "string") {
@@ -115,26 +117,40 @@ export default class SheetHelper {
       return findResult as number[];
     }
 
-    this.createColumns(uniqueValues(missingHeaders), headerRow);
+    this.createColumns({
+      headers: uniqueValues(missingHeaders),
+      headerRow,
+      hidden: true
+    });
+
+    // should succeed on second attempt
     return this.findOrCreateColumns(headers, headerRow);
   }
 
-  private createColumns(
-    headers: string[],
-    headerRow: number
-  ) {
-    forEachReverse(headers, header => this.createColumn(header, headerRow));
-  }
+  private createColumns(attrs: {
+    headers: string[];
+    headerRow: number;
+    hidden?: boolean;
+  }) {
+    const { headers, headerRow } = attrs;
 
-  private createColumn(
-    header: string,
-    headerRow: number
-  ) {
-    // XCXC
+    if (headers.length === 0) {
+      return;
+    }
+
+    this.sheet.insertColumnsBefore(1, headers.length);
+    const headerCells = this.sheet.getRange(headerRow, 1, 1, headers.length);
+
+    if (attrs.hidden) {
+      this.sheet.hideColumn(headerCells);
+    }
+
+    headerCells.setFontWeight("bold");
+    headerCells.setValues([ headers ]);
   }
 
   private extractColumnsRaw(headers: string[]): Array<any[] | null> {
-    const headerRow = 1;
+    const headerRow = DEFAULT_HEADER_ROW;
     const firstDataRow = headerRow + 1;
     const lastRow = this.sheet.getLastRow();
     const maxNumDataRows = Math.max(0, lastRow - firstDataRow + 1);
@@ -159,16 +175,45 @@ export default class SheetHelper {
     header: string;
     values: any[];
   }>) {
+    // no-op if empty `data`
+    if (data.length === 0) {
+      return;
+    }
+
+    const headerRow = DEFAULT_HEADER_ROW;
+    const firstValueRow = headerRow + 1;
+
     const headers = data.map(d => d.header);
     const duplicateHeaders = findDuplicates(headers);
     if (duplicateHeaders.length !== 0) {
       throw new Error(`duplicate headers: ${JSON.stringify(duplicateHeaders)}`);
     }
 
-    let 
-
+    const columnIdxs = this.findOrCreateColumns(headers, headerRow);
+    
+    // ensure we have enough rows to hold everything
     const maxNumValues = Math.max.apply(Math, data.map(d => d.values.length));
+    const numRowsToAdd = Math.max(0, (headerRow + maxNumValues) - this.sheet.getMaxRows());
+    if (numRowsToAdd > 0) {
+      this.sheet.insertRowsAfter(this.sheet.getMaxRows(), numRowsToAdd);
+    }
 
+    // set values and clear out existing values if the new data is shorter
+    const maxRowsToClear = Math.max(0, this.sheet.getLastRow() - headerRow);
+    columnIdxs.forEach((columnIdx, i) => {
+      const values = data[i].values;
+      if (values.length > 0) {
+        const valuesRange = this.sheet.getRange(firstValueRow, columnIdx, values.length, 1);
+        valuesRange.setValues(values.map(v => [v]));
+      }
+
+      // if there might have been data past the end, clear those cells
+      const numRowsToClear = Math.max(0, maxRowsToClear - values.length);
+      if (numRowsToClear > 0) {
+        const clearRange = this.sheet.getRange(firstValueRow + values.length, columnIdx, numRowsToClear, 1);
+        clearRange.clearContent();
+      }
+    });
   }
 }
 
