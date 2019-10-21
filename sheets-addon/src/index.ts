@@ -1,15 +1,17 @@
 import AutographManagedSheet from "./AutographManagedSheet";
+import AutographPopupWindow from "./AutographPopupWindow";
 import { registerGlobalFunction, showPreformattedDialog } from "./GoogleAppsHelpers";
 import SheetHelper, { SheetHelperTransforms } from "./SheetHelper";
 
 global.onOpen = () => {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu("Autograph")
-    .addItem("View in Autograph", viewInAutograph)
+    .addItem("View in Autograph...", viewInAutograph)
+    .addItem("Do test", doTest)
     .addToUi();
 };
 
-const viewInAutograph = registerGlobalFunction(() => {
+const doTest = registerGlobalFunction(() => {
   const sheet = SpreadsheetApp.getActiveSheet();
 
   const managedSheet = new AutographManagedSheet(sheet);
@@ -51,4 +53,9 @@ const viewInAutograph = registerGlobalFunction(() => {
       ]
     }
   ]);
+});
+
+const viewInAutograph = registerGlobalFunction(() => {
+  const popup = new AutographPopupWindow();
+  popup.display(SpreadsheetApp.getUi());
 });
