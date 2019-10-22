@@ -39,28 +39,31 @@ function parseQueryParams(queryString: string) {
   };
 }
 
-interface State {
-  queryParams: ReturnType<typeof parseQueryParams>;
-}
+type MyQueryParams = ReturnType<typeof parseQueryParams>;
 
-export default class Root extends React.Component<{}, {}> {
-  public state: State = {
-    queryParams: parseQueryParams(location.search)
-  };
-
-  public render() {
-    const { queryParams } = this.state;
-
-    if (queryParams.embedded) {
-      return (
-        "embedded mode is not yet supported"
-      );
-    }
-
-    return (
-      <App
-        initialDocumentId={queryParams.doc || null}
-      />
-    );
+const renderRoot: React.FunctionComponent<{}> = () => {
+  const queryParams = parseQueryParams(location.search);
+  if (queryParams.embedded) {
+    return renderEmbeddedApp();
+  } else {
+    return renderNormalApp(queryParams);
   }
+};
+
+function renderNormalApp(queryParams: MyQueryParams) {
+  return (
+    <App
+      initialDocumentId={queryParams.doc || null}
+    />
+  );
 }
+
+function renderEmbeddedApp() {
+  return (
+    <React.Fragment>
+      embedded mode is not yet supported
+    </React.Fragment>
+  );
+}
+
+export default renderRoot;
