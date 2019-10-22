@@ -5,7 +5,10 @@ type Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 
 const METADATA_KEY_AUTOGRAPH_CONFIG = "autograph.config";
 
-const HEADER_NODE_ID = "node.id";
+const HEADER_NODE_ID = "node:id";
+const HEADER_NODE_LABEL = "node:label";
+const HEADER_LINK_SOURCE = "link:source";
+const HEADER_LINK_TARGET = "link:target";
 
 interface AutographConfig {
   lastModifiedDate?: string;
@@ -13,8 +16,39 @@ interface AutographConfig {
 }
 
 interface LoadedData {
+  version: 1;
   autographConfig: AutographConfig;
-  nodeIds?: string[];
+  nodes: Array<{
+    id?: string;
+    label?: string;
+  }>;
+  links: Array<{
+    source?: string;
+    target?: string;
+  }>;
+}
+
+function zipObjects<
+  ZI extends { [ key: string ]: any[] }
+>(
+  input: ZI
+): Array<
+  { [ key in keyof ZI ]: (ZI[key] extends Array<infer T> ? (T | undefined) : undefined) }
+> {
+  const keys = Object.keys(input);
+  const lengths = keys.map(k => {
+    const v = input[k];
+    return (v === undefined ? 0 : v.length);
+  });
+  const maxLength = Math.max.apply(Math, lengths);
+
+  const results: any[] = [];
+  for (let i = 0; i < maxLength; ++i) {
+    results.push({});
+  }
+  keys.forEach(key => input[key].forEach((v, i) => results[i][key] = v));
+  
+  return results;
 }
 
 export default class AutographManagedSheet {
@@ -33,12 +67,32 @@ export default class AutographManagedSheet {
       nodeIds: {
         header: HEADER_NODE_ID,
         transform: SheetHelperTransforms.asString
+      },
+      nodeLabels: {
+        header: HEADER_NODE_LABEL,
+        transform: SheetHelperTransforms.asString
+      },
+      linkSources: {
+        header: HEADER_LINK_SOURCE,
+        transform: SheetHelperTransforms.asString
+      },
+      linkTargets: {
+        header: HEADER_LINK_TARGET,
+        transform: SheetHelperTransforms.asString
       }
     });
 
     return {
+      version: 1,
       autographConfig,
-      nodeIds: values.nodeIds
+      nodes: zipObjects({
+        id: values.nodeIds || [],
+        label: values.nodeLabels || []
+      }),
+      links: zipObjects({
+        source: values.linkSources || [],
+        target: values.linkTargets || []
+      })
     };
   }
 

@@ -6,6 +6,16 @@ type ValueTransform<T> = (value: any) => T;
 
 const DEFAULT_HEADER_ROW = 1;
 
+const stringOrUndefinedValueTransform: ValueTransform<string | undefined> = (v: any) => {
+  if (v === null || v === undefined || v === "") {
+    return undefined;
+  } else if (typeof v === "string") {
+    return v;
+  } else {
+    return `${v}`;
+  }
+};
+
 const stringValueTransform: ValueTransform<string> = (v: any) => {
   if (typeof v === "string") {
     return v;
@@ -17,11 +27,11 @@ const stringValueTransform: ValueTransform<string> = (v: any) => {
 };
 
 // NB: will be NaN if non-empty string that's not parseable as a number
-const numberValueTransform: ValueTransform<number | null> = (v: any) => {
+const numberValueTransform: ValueTransform<number | undefined> = (v: any) => {
   if (typeof v === "number") {
     return v;
   } else if (v === null || v === undefined || v === "") {
-    return null;
+    return undefined;
   } else {
     return parseFloat(`${v}`);
   }
@@ -29,7 +39,8 @@ const numberValueTransform: ValueTransform<number | null> = (v: any) => {
 
 export const SheetHelperTransforms = {
   asString: stringValueTransform,
-  asNumberOrNull: numberValueTransform
+  asStringOrUndefined: stringOrUndefinedValueTransform,
+  asNumberOrUndefined: numberValueTransform
 };
 
 // tslint:disable-next-line: interface-over-type-literal

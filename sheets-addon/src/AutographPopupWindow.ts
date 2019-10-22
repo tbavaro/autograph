@@ -6,14 +6,18 @@ const POPUP_TITLE = "Autograph";
 const POPUP_TEMPLATE_FILENAME = "AutographPopup.template.html";
 
 export default class AutographPopupWindow {
-  public display(ui: GoogleAppsScript.Base.Ui, isDev: boolean) {
+  public display(attrs: {
+    ui: GoogleAppsScript.Base.Ui,
+    data: any,
+    isDev?: boolean
+  }) {
     const template = HtmlService.createTemplateFromFile(POPUP_TEMPLATE_FILENAME);
-    template.url = (isDev ? "https://localhost:3001/" : "https://tbavaro.github.io/autograph/") + "?embedded";
-    template.targetOrigin = (isDev ? "*" : "tbavaro.github.io");
-    template.appData = JSON.stringify({ appValue: 123 });
+    template.url = (attrs.isDev ? "https://localhost:3001/" : "https://tbavaro.github.io/autograph/") + "?embedded";
+    template.targetOrigin = (attrs.isDev ? "*" : "tbavaro.github.io");
+    template.appData = JSON.stringify(attrs.data);
     const html = template.evaluate();
     html.setWidth(DEFAULT_WIDTH);
     html.setHeight(DEFAULT_HEIGHT);
-    ui.showModalDialog(html, POPUP_TITLE);
+    attrs.ui.showModalDialog(html, POPUP_TITLE);
   }
 }

@@ -91,10 +91,10 @@ class EmbeddedAppRoot extends React.Component<{}, State> {
       return (this.state.showWaitingMessageIfWaiting ? "waiting for data..." : "");
     } else {
       return (
-        <div>
+        <div style={{ position: "absolute", overflow: "scroll", maxHeight: "100%", width: "100%" }}>
           got data
           <pre>
-            {this.state.appData}
+            {JSON.stringify(JSON.parse(this.state.appData), null, 2)}
           </pre>
         </div>
       );

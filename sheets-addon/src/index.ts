@@ -24,7 +24,7 @@ const doTest = registerGlobalFunction(() => {
     },
     bValues: {
       header: "b",
-      transform: SheetHelperTransforms.asNumberOrNull
+      transform: SheetHelperTransforms.asNumberOrUndefined
     }
   });
   
@@ -56,8 +56,16 @@ const doTest = registerGlobalFunction(() => {
 });
 
 function viewInAutographImpl(isDev: boolean) {
+  const sheet = SpreadsheetApp.getActiveSheet();
+  const managedSheet = new AutographManagedSheet(sheet);
+  const data = managedSheet.loadData();
+
   const popup = new AutographPopupWindow();
-  popup.display(SpreadsheetApp.getUi(), isDev);
+  popup.display({
+    ui: SpreadsheetApp.getUi(),
+    data,
+    isDev
+  });
 }
 
 const viewInAutographDev = registerGlobalFunction(() => viewInAutographImpl(/*isDev=*/true));
