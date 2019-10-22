@@ -60,10 +60,13 @@ function renderNormalApp(queryParams: MyQueryParams) {
 
 interface State {
   appData?: string;
+  showWaitingMessageIfWaiting: boolean;
 }
 
 class EmbeddedAppRoot extends React.Component<{}, State> {
-  public state: State = {};
+  public state: State = {
+    showWaitingMessageIfWaiting: false
+  };
 
   public componentWillMount() {
     if (super.componentWillMount) {
@@ -75,11 +78,17 @@ class EmbeddedAppRoot extends React.Component<{}, State> {
         appData: event.data
       });
     });
+
+    setTimeout(() => {
+      this.setState({
+        showWaitingMessageIfWaiting: true
+      });
+    }, 1000);
   }
 
   public render() {
     if (this.state.appData === undefined) {
-      return "waiting for data...";
+      return (this.state.showWaitingMessageIfWaiting ? "waiting for data..." : "");
     } else {
       return (
         <div>
