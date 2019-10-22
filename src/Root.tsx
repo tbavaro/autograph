@@ -44,7 +44,7 @@ type MyQueryParams = ReturnType<typeof parseQueryParams>;
 const renderRoot: React.FunctionComponent<{}> = () => {
   const queryParams = parseQueryParams(location.search);
   if (queryParams.embedded) {
-    return renderEmbeddedApp();
+    return (<EmbeddedAppRoot/>);
   } else {
     return renderNormalApp(queryParams);
   }
@@ -58,12 +58,39 @@ function renderNormalApp(queryParams: MyQueryParams) {
   );
 }
 
-function renderEmbeddedApp() {
-  return (
-    <React.Fragment>
-      embedded mode is not yet supported
-    </React.Fragment>
-  );
+interface State {
+  appData?: string;
+}
+
+class EmbeddedAppRoot extends React.Component<{}, State> {
+  public state: State = {};
+
+  public componentWillMount() {
+    if (super.componentWillMount) {
+      super.componentWillMount();
+    }
+
+    window.addEventListener("message", (event: MessageEvent) => {
+      this.setState({ 
+        appData: event.data
+      });
+    });
+  }
+
+  public render() {
+    if (this.state.appData === undefined) {
+      return "waiting for data...";
+    } else {
+      return (
+        <div>
+          got data
+          <pre>
+            {this.state.appData}
+          </pre>
+        </div>
+      );
+    }
+  }
 }
 
 export default renderRoot;

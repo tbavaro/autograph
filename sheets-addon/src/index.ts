@@ -6,7 +6,7 @@ import SheetHelper, { SheetHelperTransforms } from "./SheetHelper";
 global.onOpen = () => {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu("Autograph")
-    .addItem("View in Autograph...", viewInAutograph)
+    .addItem("View in Autograph... (dev)", viewInAutographDev)
     .addItem("Do test", doTest)
     .addToUi();
 };
@@ -55,7 +55,9 @@ const doTest = registerGlobalFunction(() => {
   ]);
 });
 
-const viewInAutograph = registerGlobalFunction(() => {
+function viewInAutographImpl(isDev: boolean) {
   const popup = new AutographPopupWindow();
-  popup.display(SpreadsheetApp.getUi());
-});
+  popup.display(SpreadsheetApp.getUi(), isDev);
+}
+
+const viewInAutographDev = registerGlobalFunction(() => viewInAutographImpl(/*isDev=*/true));
