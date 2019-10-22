@@ -1,7 +1,6 @@
 import CssBaseline from "@material-ui/core/CssBaseline";
 import EditIcon from "@material-ui/icons/Edit";
 
-import * as QueryString from "query-string";
 import * as React from "react";
 
 import "./App.css";
@@ -27,6 +26,10 @@ type AllActions =
   PropertiesDrawerContents.Actions &
   SearchPopperContents.Actions;
 
+interface Props {
+  initialDocumentId: string | null;
+}
+
 interface State {
   canSaveDocument: boolean;
   datastoreStatus: DatastoreStatus;
@@ -36,7 +39,7 @@ interface State {
   modalOverlayText: string | null;
 }
 
-class App extends React.Component<{}, State> {
+class App extends React.Component<Props, State> {
   public state: State = {
     canSaveDocument: false,
     datastoreStatus: DatastoreStatus.Initializing,
@@ -64,16 +67,8 @@ class App extends React.Component<{}, State> {
     this.datastore.addListener("status_changed", this.onDatastoreStatusChanged);
     this.onDatastoreStatusChanged();
 
-    // open doc if its id is specified in the url query params
-    const queryParams = QueryString.parse(location.search);
-    let documentId: string | null = null;
-    if (queryParams.doc instanceof Array && queryParams.doc.length >= 1) {
-      documentId = queryParams.doc[0];
-    } else if (typeof queryParams.doc === "string") {
-      documentId = queryParams.doc;
-    }
-    if (documentId) {
-      this.loadDocumentById(documentId);
+    if (this.props.initialDocumentId) {
+      this.loadDocumentById(this.props.initialDocumentId);
     } else {
       // TODO in the old version this would automatically open the left nav
       this.hideModalOverlay();
