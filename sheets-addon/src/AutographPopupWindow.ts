@@ -6,6 +6,7 @@ const POPUP_TEMPLATE_FILENAME = "AutographPopup.template.html";
 export default class AutographPopupWindow {
   public display(ui: GoogleAppsScript.Base.Ui) {
     const template = HtmlService.createTemplateFromFile(POPUP_TEMPLATE_FILENAME);
+    template.text = `<b>"date: ${new Date()}</b>`;
     const html = template.evaluate();
     html.setWidth(DEFAULT_WIDTH);
     html.setHeight(DEFAULT_HEIGHT);
