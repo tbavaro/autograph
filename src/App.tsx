@@ -100,6 +100,7 @@ class App extends React.Component<Props, State> {
     const navDrawerContents = (
       <NavDrawerContents.default
         actions={this.actionManager}
+        allowOpen={!this.props.isEmbedded}
         canSave={this.state.canSaveDocument}
         documentIsLoaded={this.state.document !== null}
         datastoreStatus={this.datastore.status()}

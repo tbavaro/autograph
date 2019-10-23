@@ -12,6 +12,7 @@ import "./NavDrawerContents.css";
 
 export interface Props {
   actions: Actions;
+  allowOpen: boolean;
   canSave: boolean;
   documentIsLoaded: boolean;
   datastoreStatus: DatastoreStatus;
@@ -94,10 +95,12 @@ class NavDrawerContents extends React.Component<Props, {}> {
           {
             isSignedIn
               ? [
-                  renderMenuOption({
-                    label: "Open...",
-                    action: this.props.actions.openFromGoogle
-                  }),
+                  this.props.allowOpen
+                    ? renderMenuOption({
+                        label: "Open...",
+                        action: this.props.actions.openFromGoogle
+                      })
+                    : null,
                   renderMenuOption({
                     label: "Save",
                     disabled: !this.props.canSave,
