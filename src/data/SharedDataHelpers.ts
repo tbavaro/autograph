@@ -1,3 +1,4 @@
+import { valueIfUndefined } from "../util/Utils";
 import * as GraphData from "./GraphData";
 import { GraphDocument } from "./GraphDocument";
 import { LoadedData, LoadedDataAny } from "./SharedTypes";
@@ -16,13 +17,67 @@ export function parseLoadedData(json: string): LoadedData {
   }
 }
 
+function mapNodes(ds: LoadedData["nodes"], nodeIdsAccum: Set<string>, errors: string[]) {
+  const results: GraphData.SerializedNodeV1[] = [];
+  ds.forEach(d => {
+    if (d.id !== undefined && d.id !== "") {
+      if (nodeIdsAccum.has(d.id)) {
+        errors.push(`duplicate node id: "${d.id}"`);
+      } else {
+        nodeIdsAccum.add(d.id);
+        results.push({
+          id: d.id,
+          label: valueIfUndefined(d.label, d.id)
+        });
+      }
+    }
+  });
+  return results;
+}
+
+function mapLinks(ds: LoadedData["links"], validNodeIds: Set<string>, errors: string[]) {
+  const results: GraphData.SerializedLinkV1[] = [];
+  ds.forEach(d => {
+    if (d.source === undefined || d.target === undefined) {
+      return;
+    }
+
+    if (!validNodeIds.has(d.source)) {
+      errors.push(`link references unknown node id: "${d.source}"`);
+      return;
+    }
+
+    if (!validNodeIds.has(d.target)) {
+      errors.push(`link references unknown node id: "${d.target}"`);
+      return;
+    }
+
+    results.push({
+      source: d.source,
+      target: d.target    
+    });
+  });
+  return results;
+}
+
 export function documentFromLoadedData(data: LoadedData): GraphDocument {
+  const errors: string[] = [];
+
+  const nodeIds = new Set<string>();
+  const nodes = mapNodes(data.nodes, nodeIds, errors);
+
+  const serializedGraphData: GraphData.SerializedDocument = {
+    version: 1,
+    nodes,
+    links: mapLinks(data.links, nodeIds, errors)
+  };
+
+  if (errors.length > 0) {
+    alert(`there were ${errors.length} errors:\n${errors.join("\n")}`);
+  }
+
   return new GraphDocument({
     name: "embedded data",
-    data: GraphData.load({
-      version: 1,
-      nodes: [],
-      links: []
-    })
-  })
+    data: GraphData.load(serializedGraphData)
+  });
 }

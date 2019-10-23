@@ -262,7 +262,13 @@ class App extends React.Component<Props, State> {
   }
 
   public setEmbeddedDocument(document: GraphDocument) {
+    console.log("setting doc");
     this.setDocument(document, null, false);
+    setTimeout(() => {
+      if (this.simulationViewportRef) {
+        this.simulationViewportRef.repositionNodes();
+      }
+    }, 1);
   }
 
   private setDocument = (

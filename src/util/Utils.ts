@@ -31,3 +31,7 @@ export function forSome<T>(
     });
   }
 }
+
+export function valueIfUndefined<T>(v: T | undefined, defaultValue: T): T {
+  return (v === undefined ? defaultValue : v);
+}

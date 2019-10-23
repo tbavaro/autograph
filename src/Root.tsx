@@ -84,9 +84,11 @@ class EmbeddedAppRoot extends React.Component<{}, State> {
     window.addEventListener("message", onMessageEvent);
 
     setTimeout(() => {
-      this.setState({
-        showWaitingMessageIfWaiting: true
-      });
+      if (this.state.appData === undefined) {
+        this.setState({
+          showWaitingMessageIfWaiting: true
+        });
+      }
     }, 1000);
   }
 
