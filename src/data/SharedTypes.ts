@@ -11,10 +11,15 @@ export interface LoadedDataV1 extends Versioned<1> {
   nodes: Array<{
     id?: string;
     label?: string;
+    secondaryLabel?: string;
+    url?: string;
+    color?: string;
+    rank?: number;
   }>;
   links: Array<{
     source?: string;
     target?: string;
+    stroke?: string;
   }>;
 }
 

@@ -27,12 +27,24 @@ function mapNodes(ds: LoadedData["nodes"], nodeIdsAccum: Set<string>, errors: st
         nodeIdsAccum.add(d.id);
         results.push({
           id: d.id,
-          label: valueIfUndefined(d.label, d.id)
+          label: valueIfUndefined(d.label, d.id),
+          secondaryLabel: d.secondaryLabel,
+          url: d.url,
+          color: d.color,
+          rank: d.rank
         });
       }
     }
   });
   return results;
+}
+
+function constrainValues<T>(value: any, allowedValues: T[]): T | undefined {
+  if (allowedValues.includes(value)) {
+    return value;
+  } else {
+    return undefined;
+  }
 }
 
 function mapLinks(ds: LoadedData["links"], validNodeIds: Set<string>, errors: string[]) {
@@ -54,7 +66,8 @@ function mapLinks(ds: LoadedData["links"], validNodeIds: Set<string>, errors: st
 
     results.push({
       source: d.source,
-      target: d.target    
+      target: d.target,
+      stroke: constrainValues(d.stroke, ["solid", "dashed"])
     });
   });
   return results;

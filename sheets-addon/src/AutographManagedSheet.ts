@@ -8,8 +8,13 @@ const METADATA_KEY_AUTOGRAPH_CONFIG = "autograph.config";
 
 const HEADER_NODE_ID = "node:id";
 const HEADER_NODE_LABEL = "node:label";
+const HEADER_NODE_SECONDARY_LABEL = "node:secondaryLabel";
+const HEADER_NODE_URL = "node:url";
+const HEADER_NODE_COLOR = "node:color";
+const HEADER_NODE_RANK = "node:rank";
 const HEADER_LINK_SOURCE = "link:source";
 const HEADER_LINK_TARGET = "link:target";
+const HEADER_LINK_STROKE = "link:stroke";
 
 function zipObjects<
   ZI extends { [ key: string ]: any[] }
@@ -49,19 +54,39 @@ export default class AutographManagedSheet {
     const values = this.helper.readColumnData({
       nodeIds: {
         header: HEADER_NODE_ID,
-        transform: SheetHelperTransforms.asString
+        transform: SheetHelperTransforms.asStringOrUndefined
       },
       nodeLabels: {
         header: HEADER_NODE_LABEL,
-        transform: SheetHelperTransforms.asString
+        transform: SheetHelperTransforms.asStringOrUndefined
+      },
+      nodeSecondaryLabels: {
+        header: HEADER_NODE_SECONDARY_LABEL,
+        transform: SheetHelperTransforms.asStringOrUndefined
+      },
+      nodeUrls: {
+        header: HEADER_NODE_URL,
+        transform: SheetHelperTransforms.asStringOrUndefined
+      },
+      nodeColors: {
+        header: HEADER_NODE_COLOR,
+        transform: SheetHelperTransforms.asStringOrUndefined
+      },
+      nodeRanks: {
+        header: HEADER_NODE_RANK,
+        transform: SheetHelperTransforms.asNumberOrUndefined
       },
       linkSources: {
         header: HEADER_LINK_SOURCE,
-        transform: SheetHelperTransforms.asString
+        transform: SheetHelperTransforms.asStringOrUndefined
       },
       linkTargets: {
         header: HEADER_LINK_TARGET,
-        transform: SheetHelperTransforms.asString
+        transform: SheetHelperTransforms.asStringOrUndefined
+      },
+      linkStrokes: {
+        header: HEADER_LINK_STROKE,
+        transform: SheetHelperTransforms.asStringOrUndefined
       }
     });
 
@@ -70,11 +95,16 @@ export default class AutographManagedSheet {
       // autographConfig,
       nodes: zipObjects({
         id: values.nodeIds || [],
-        label: values.nodeLabels || []
+        label: values.nodeLabels || [],
+        secondaryLabel: values.nodeSecondaryLabels || [],
+        url: values.nodeUrls || [],
+        color: values.nodeColors || [],
+        rank: values.nodeRanks || [],
       }),
       links: zipObjects({
         source: values.linkSources || [],
-        target: values.linkTargets || []
+        target: values.linkTargets || [],
+        stroke: values.linkStrokes || []
       })
     };
   }
