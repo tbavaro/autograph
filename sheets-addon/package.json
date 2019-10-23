@@ -10,7 +10,8 @@
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "push": "npm run clasp push",
     "watch": "watch 'npm run build && npm run push && npm run deploy-test' src/",
-    "build": "webpack --mode development --config ./webpack.config.js && npm run add-bundle-preamble && npm run copy-html",
+    "build": "npm run prebuild && webpack --mode development --config ./webpack.config.js && npm run add-bundle-preamble && npm run copy-html",
+    "prebuild": "ln -fs `pwd`/../src/data/SharedTypes.ts src/generated/SharedTypes.ts",
     "add-bundle-preamble": "mv dist/bundle.js dist/bundle.original.js && cat src/bundlePreamble.js dist/bundle.original.js > dist/bundle.js && rm dist/bundle.original.js",
     "copy-html": "rm -f dist/*.html && cp src/*.html dist/",
     "deploy-test": "clasp deploy --deploymentId AKfycbzo24jg0Hri-eMkdLlsVILn6u54nJju2T5T_10keBFy"

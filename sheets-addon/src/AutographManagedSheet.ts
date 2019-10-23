@@ -1,3 +1,4 @@
+import { LoadedData } from "./generated/SharedTypes";
 import SheetHelper, { SheetHelperTransforms } from "./SheetHelper";
 import { findInArray } from "./util";
 
@@ -9,24 +10,6 @@ const HEADER_NODE_ID = "node:id";
 const HEADER_NODE_LABEL = "node:label";
 const HEADER_LINK_SOURCE = "link:source";
 const HEADER_LINK_TARGET = "link:target";
-
-interface AutographConfig {
-  lastModifiedDate?: string;
-  appData?: string;
-}
-
-interface LoadedData {
-  version: 1;
-  autographConfig: AutographConfig;
-  nodes: Array<{
-    id?: string;
-    label?: string;
-  }>;
-  links: Array<{
-    source?: string;
-    target?: string;
-  }>;
-}
 
 function zipObjects<
   ZI extends { [ key: string ]: any[] }
@@ -61,7 +44,7 @@ export default class AutographManagedSheet {
   }
 
   public loadData(): LoadedData {
-    const autographConfig = this.loadAutographConfig();
+    // const autographConfig = this.loadAutographConfig();
 
     const values = this.helper.readColumnData({
       nodeIds: {
@@ -84,7 +67,7 @@ export default class AutographManagedSheet {
 
     return {
       version: 1,
-      autographConfig,
+      // autographConfig,
       nodes: zipObjects({
         id: values.nodeIds || [],
         label: values.nodeLabels || []
@@ -113,17 +96,17 @@ export default class AutographManagedSheet {
     return this.getOrCreateAutographConfigMetadata();
   }
 
-  public loadAutographConfig(): AutographConfig {
-    return JSON.parse(this.getOrCreateAutographConfigMetadata().getValue());
-  }
+  // public loadAutographConfig(): AutographConfig {
+  //   return JSON.parse(this.getOrCreateAutographConfigMetadata().getValue());
+  // }
 
-  private saveAutographConfig(config: AutographConfig) {
-    this.getOrCreateAutographConfigMetadata().setValue(JSON.stringify(config));
-  }
+  // private saveAutographConfig(config: AutographConfig) {
+  //   this.getOrCreateAutographConfigMetadata().setValue(JSON.stringify(config));
+  // }
 
-  public updateAutographConfig(transform: (prevConfig: AutographConfig) => AutographConfig | void) {
-    const prevConfig = this.loadAutographConfig();
-    const newConfig = transform(prevConfig) || prevConfig;
-    this.saveAutographConfig(newConfig);
-  }
+  // public updateAutographConfig(transform: (prevConfig: AutographConfig) => AutographConfig | void) {
+  //   const prevConfig = this.loadAutographConfig();
+  //   const newConfig = transform(prevConfig) || prevConfig;
+  //   this.saveAutographConfig(newConfig);
+  // }
 }

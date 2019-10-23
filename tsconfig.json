@@ -31,5 +31,5 @@
     "jest",
     "src/setupTests.ts",
     "sheets-addon"
-  ]
+  ],
 }

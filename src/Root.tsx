@@ -2,6 +2,8 @@ import * as QueryString from "query-string";
 import * as React from "react";
 
 import App from "./App";
+import * as SharedDataHelpers from "./data/SharedDataHelpers";
+import { LoadedData } from "./data/SharedTypes";
 
 class QueryParamHelper {
   private readonly values: QueryString.ParsedQuery;
@@ -51,11 +53,10 @@ const renderRoot: React.FunctionComponent<{}> = () => {
 };
 
 function renderNormalApp(queryParams: MyQueryParams) {
-  return (
-    <App
-      initialDocumentId={queryParams.doc || null}
-    />
-  );
+  return <App
+    initialDocumentId={queryParams.doc}
+    isEmbedded={false}
+  />;
 }
 
 interface State {
@@ -73,11 +74,14 @@ class EmbeddedAppRoot extends React.Component<{}, State> {
       super.componentWillMount();
     }
 
-    window.addEventListener("message", (event: MessageEvent) => {
+    const onMessageEvent = (event: MessageEvent) => {
+      window.removeEventListener("message", onMessageEvent);
       this.setState({ 
         appData: event.data
       });
-    });
+    };
+
+    window.addEventListener("message", onMessageEvent);
 
     setTimeout(() => {
       this.setState({
@@ -88,17 +92,49 @@ class EmbeddedAppRoot extends React.Component<{}, State> {
 
   public render() {
     if (this.state.appData === undefined) {
-      return (this.state.showWaitingMessageIfWaiting ? "waiting for data..." : "");
+      return this.renderWaitingState();
     } else {
-      return (
-        <div style={{ position: "absolute", overflow: "scroll", maxHeight: "100%", width: "100%" }}>
-          got data
-          <pre>
-            {JSON.stringify(JSON.parse(this.state.appData), null, 2)}
-          </pre>
-        </div>
-      );
+      let data: LoadedData;
+      try {
+        data = SharedDataHelpers.parseLoadedData(this.state.appData);
+      } catch (e) {
+        console.error("error loading data", e);
+        return this.renderErrorState();
+      }
+      return this.renderLoadedState(data);
     }
+  }
+
+  private renderWaitingState() {
+    return (this.state.showWaitingMessageIfWaiting ? "waiting for data..." : "");
+  }
+
+  private renderErrorState() {
+    return "error loading data (see console)";
+  }
+
+  private renderLoadedState(data: LoadedData) {
+    const setAppRef = (appRef: App | null) => {
+      if (appRef !== null) {
+        appRef.setEmbeddedDocument(SharedDataHelpers.documentFromLoadedData(data));
+      }
+    };
+
+    return (
+      <App 
+        isEmbedded={true}
+        ref={setAppRef}
+      />
+    );
+
+    //   <div style={{ position: "absolute", overflow: "scroll", maxHeight: "100%", width: "100%" }}>
+    //     got data
+    //     <pre>
+    //       data loaded
+    //       {JSON.stringify(data, null, 2)}
+    //     </pre>
+    //   </div>
+    // );
   }
 }
 

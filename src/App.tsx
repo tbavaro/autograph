@@ -27,7 +27,8 @@ type AllActions =
   SearchPopperContents.Actions;
 
 interface Props {
-  initialDocumentId: string | null;
+  initialDocumentId?: string;
+  isEmbedded: boolean;
 }
 
 interface State {
@@ -67,7 +68,7 @@ class App extends React.Component<Props, State> {
     this.datastore.addListener("status_changed", this.onDatastoreStatusChanged);
     this.onDatastoreStatusChanged();
 
-    if (this.props.initialDocumentId) {
+    if (this.props.initialDocumentId !== undefined) {
       this.loadDocumentById(this.props.initialDocumentId);
     } else {
       // TODO in the old version this would automatically open the left nav
@@ -260,6 +261,10 @@ class App extends React.Component<Props, State> {
     }
   }
 
+  public setEmbeddedDocument(document: GraphDocument) {
+    this.setDocument(document, null, false);
+  }
+
   private setDocument = (
     document: GraphDocument,
     documentId: string | null,
@@ -290,6 +295,10 @@ class App extends React.Component<Props, State> {
       const needsExtraAmpersand = encodedDocumentId.match(/[^A-Za-z0-9]$/);
 
       url = `?doc=${encodedDocumentId}${needsExtraAmpersand ? "&" : ""}`;
+    }
+
+    if (this.props.isEmbedded) {
+      url += "&embedded";
     }
 
     history.replaceState({}, window.document.title, url);
