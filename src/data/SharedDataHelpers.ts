@@ -1,7 +1,7 @@
 import { valueIfUndefined } from "../util/Utils";
 import * as GraphData from "./GraphData";
 import { GraphDocument } from "./GraphDocument";
-import { LoadedData, LoadedDataAny } from "./SharedTypes";
+import { LoadedData, LoadedDataAny, PositionData } from "./SharedTypes";
 
 // parses the JSON received from sheets addon and upgrades it to the latest format
 export function parseLoadedData(json: string): LoadedData {
@@ -93,4 +93,16 @@ export function documentFromLoadedData(data: LoadedData): GraphDocument {
     name: "embedded data",
     data: GraphData.load(serializedGraphData)
   });
+}
+
+export function positionDataFromDocument(document: GraphDocument): PositionData {
+  return {
+    version: 1,
+    nodes: document.nodes.map(n => ({
+      id: n.id,
+      isLocked: n.isLocked,
+      x: n.x,
+      y: n.y
+    }))
+  };
 }

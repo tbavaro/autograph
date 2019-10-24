@@ -10,6 +10,7 @@ import * as GraphData from "./data/GraphData";
 import { GraphDocument, SimulationPropertyField } from "./data/GraphDocument";
 import { SimpleListenable } from "./data/Listenable";
 import { MyNodeDatum } from "./data/MyNodeDatum";
+import * as SharedDataHelpers from "./data/SharedDataHelpers";
 import * as SpreadsheetImporter from "./data/SpreadsheetImporter";
 import * as GooglePickerHelper from "./google/GooglePickerHelper";
 
@@ -143,6 +144,7 @@ class App extends React.Component<Props, State> {
           onSearchFieldFocusChange={this.setSimulationIsPaused}
         >
           {this.renderBody()}
+          {this.maybeRenderSavePositionsButton()}
         </MyAppRoot>
         {this.maybeRenderModalOverlay()}
       </React.Fragment>
@@ -197,6 +199,36 @@ class App extends React.Component<Props, State> {
       );
     }
   };
+
+  private maybeRenderSavePositionsButton() {
+    if (!this.props.isEmbedded) {
+      return null;
+    }
+
+    return (
+      <div
+        className="App-savePositionsButton"
+        onClick={this.savePositionsInSheets}
+      >
+        Save positions in Sheets
+      </div>
+    );
+  }
+
+  private savePositionsInSheets = () => {
+    const document = this.state.document;
+    if (!document) {
+      console.error("no document loaded");
+      return;
+    }
+
+    const message = {
+      app: "autograph",
+      action: "savePositions",
+      data: SharedDataHelpers.positionDataFromDocument(document)
+    };
+    window.parent.postMessage(message, "*");
+  }
 
   private onDatastoreStatusChanged = () => {
     const newStatus = this.datastore.status();

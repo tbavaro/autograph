@@ -14,4 +14,24 @@
     var iframe = document.getElementById("iframe");
     iframe.contentWindow.postMessage("<?= appData ?>", "<?= targetOrigin ?>");
   }
+
+  function closeWindow() {
+    google.script.host.close();
+  }
+
+  window.addEventListener("message", function(e) {
+    console.log("got message", e.data);
+    var msg = e.data;
+    if (msg && (typeof msg === "object" && msg.app === "autograph")) {
+      switch (msg.action) {
+        case "savePositions":
+          google.script.run.withSuccessHandler(closeWindow).autographSavePositions(msg.data);
+          break;
+
+        default:
+          console.error("unsupported action", data.action);
+          break;
+      }
+    }
+  });
 </script>

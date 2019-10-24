@@ -1,6 +1,9 @@
 import AutographManagedSheet from "./AutographManagedSheet";
 import AutographPopupWindow from "./AutographPopupWindow";
 import { registerGlobalFunction } from "./GoogleAppsHelpers";
+import SheetHelper from "./SheetHelper";
+import { PositionData } from "./generated/SharedTypes";
+import { valueIfUndefined } from "./util";
 
 global.onOpen = () => {
   const ui = SpreadsheetApp.getUi();
@@ -68,3 +71,28 @@ function viewInAutographImpl(isDev: boolean) {
 }
 
 const viewInAutographDev = registerGlobalFunction(() => viewInAutographImpl(/*isDev=*/true));
+
+global.autographSavePositions = (data: PositionData) => {
+  Logger.log("writing values");
+  const sheet = SpreadsheetApp.getActiveSheet();
+  const helper = new SheetHelper(sheet);
+  helper.writeColumnData([
+    {
+      header: "managed:node:id",
+      values: data.nodes.map(n => n.id)
+    },
+    {
+      header: "managed:node:isLocked",
+      values: data.nodes.map(n => n.isLocked)
+    },
+    {
+      header: "managed:node:x",
+      values: data.nodes.map(n => valueIfUndefined<number | string>(n.x, ""))
+    },
+    {
+      header: "managed:node:y",
+      values: data.nodes.map(n => valueIfUndefined<number | string>(n.y, ""))
+    }
+  ]);
+  Logger.log("finished writing values");
+};

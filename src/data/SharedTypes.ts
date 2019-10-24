@@ -26,3 +26,14 @@ export interface LoadedDataV1 extends Versioned<1> {
 export type LoadedData = LoadedDataV1;
 
 export type LoadedDataAny = LoadedDataV1;
+
+export interface PositionDataV1 extends Versioned<1> {
+  nodes: Array<{
+    id: string;
+    isLocked: boolean;
+    x?: number;
+    y?: number;
+  }>
+}
+
+export type PositionData = PositionDataV1;
