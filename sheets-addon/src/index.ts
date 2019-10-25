@@ -75,24 +75,7 @@ const viewInAutographDev = registerGlobalFunction(() => viewInAutographImpl(/*is
 global.autographSavePositions = (data: PositionData) => {
   Logger.log("writing values");
   const sheet = SpreadsheetApp.getActiveSheet();
-  const helper = new SheetHelper(sheet);
-  helper.writeColumnData([
-    {
-      header: "managed:node:id",
-      values: data.nodes.map(n => n.id)
-    },
-    {
-      header: "managed:node:isLocked",
-      values: data.nodes.map(n => n.isLocked)
-    },
-    {
-      header: "managed:node:x",
-      values: data.nodes.map(n => valueIfUndefined<number | string>(n.x, ""))
-    },
-    {
-      header: "managed:node:y",
-      values: data.nodes.map(n => valueIfUndefined<number | string>(n.y, ""))
-    }
-  ]);
+  const managedSheet = new AutographManagedSheet(sheet);
+  managedSheet.saveData(data);
   Logger.log("finished writing values");
 };

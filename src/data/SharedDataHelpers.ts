@@ -81,6 +81,8 @@ export function documentFromLoadedData(data: LoadedData): GraphDocument {
 
   const serializedGraphData: GraphData.SerializedDocument = {
     version: 1,
+    layoutState: data.autographSettings.layoutState,
+    zoomState: data.autographSettings.zoomState,
     nodes,
     links: mapLinks(data.links, nodeIds, errors)
   };
@@ -96,8 +98,17 @@ export function documentFromLoadedData(data: LoadedData): GraphDocument {
 }
 
 export function positionDataFromDocument(document: GraphDocument): PositionData {
+  const layoutState = document.layoutState;
+  if (layoutState.layoutType !== "force_simulation") {
+    throw new Error(`layoutType not supported: ${layoutState.layoutType}`);
+  }
+
   return {
     version: 1,
+    autographSettings: {
+      layoutState: document.layoutState,
+      zoomState: document.zoomState
+    },
     nodes: document.nodes.map(n => ({
       id: n.id,
       isLocked: n.isLocked,

@@ -1,10 +1,10 @@
-import { LoadedData } from "./generated/SharedTypes";
-import SheetHelper, { SheetHelperTransforms } from "./SheetHelper";
-import { findInArray } from "./util";
+import { LoadedData, PositionData } from "./generated/SharedTypes";
+import SheetHelper, { SheetHelperTransforms, ValueTransform } from "./SheetHelper";
+import { valueIfUndefined } from "./util";
 
 type Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 
-const METADATA_KEY_AUTOGRAPH_CONFIG = "autograph.config";
+const HEADER_MANAGED_AUTOGRAPH_SETTINGS = "managed:autograph:settings";
 
 const HEADER_NODE_ID = "node:id";
 const HEADER_NODE_LABEL = "node:label";
@@ -49,9 +49,11 @@ export default class AutographManagedSheet {
   }
 
   public loadData(): LoadedData {
-    // const autographConfig = this.loadAutographConfig();
-
     const values = this.helper.readColumnData({
+      autographSettings: {
+        header: HEADER_MANAGED_AUTOGRAPH_SETTINGS,
+        transform: SheetHelperTransforms.asString
+      },
       nodeIds: {
         header: HEADER_NODE_ID,
         transform: SheetHelperTransforms.asStringOrUndefined
@@ -92,7 +94,7 @@ export default class AutographManagedSheet {
 
     return {
       version: 1,
-      // autographConfig,
+      autographSettings: this.helper.unpackKeysAndValues(values.autographSettings || []),
       nodes: zipObjects({
         id: values.nodeIds || [],
         label: values.nodeLabels || [],
@@ -109,34 +111,28 @@ export default class AutographManagedSheet {
     };
   }
 
-  private getOrCreateAutographConfigMetadata(): GoogleAppsScript.Spreadsheet.DeveloperMetadata {
-    const metadata = this.sheet.getDeveloperMetadata();
-    // metadata.forEach(m => {
-    //   Logger.log(JSON.stringify({
-    //     key: m.getKey(),
-    //     value: m.getValue()
-    //   }));
-    // });
-
-    const configMetadata = findInArray(metadata, m => m.getKey() === METADATA_KEY_AUTOGRAPH_CONFIG);
-    if (configMetadata !== undefined) {
-      return configMetadata;
-    }
-    this.sheet.addDeveloperMetadata(METADATA_KEY_AUTOGRAPH_CONFIG, "{}");
-    return this.getOrCreateAutographConfigMetadata();
+  public saveData(data: PositionData) {
+    this.helper.writeColumnData([
+      {
+        header: HEADER_MANAGED_AUTOGRAPH_SETTINGS,
+        values: this.helper.packKeysAndValues(data.autographSettings)
+      },
+      {
+        header: "managed:node:id",
+        values: data.nodes.map(n => n.id)
+      },
+      {
+        header: "managed:node:isLocked",
+        values: data.nodes.map(n => n.isLocked)
+      },
+      {
+        header: "managed:node:x",
+        values: data.nodes.map(n => valueIfUndefined<number | string>(n.x, ""))
+      },
+      {
+        header: "managed:node:y",
+        values: data.nodes.map(n => valueIfUndefined<number | string>(n.y, ""))
+      }
+    ]);
   }
-
-  // public loadAutographConfig(): AutographConfig {
-  //   return JSON.parse(this.getOrCreateAutographConfigMetadata().getValue());
-  // }
-
-  // private saveAutographConfig(config: AutographConfig) {
-  //   this.getOrCreateAutographConfigMetadata().setValue(JSON.stringify(config));
-  // }
-
-  // public updateAutographConfig(transform: (prevConfig: AutographConfig) => AutographConfig | void) {
-  //   const prevConfig = this.loadAutographConfig();
-  //   const newConfig = transform(prevConfig) || prevConfig;
-  //   this.saveAutographConfig(newConfig);
-  // }
 }

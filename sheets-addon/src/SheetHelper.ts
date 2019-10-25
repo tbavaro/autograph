@@ -2,7 +2,7 @@ import { findDuplicates, uniqueValues } from "./util";
 
 type Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 
-type ValueTransform<T> = (value: any) => T;
+export type ValueTransform<T> = (value: any) => T;
 
 const DEFAULT_HEADER_ROW = 1;
 
@@ -43,14 +43,6 @@ export const SheetHelperTransforms = {
   asNumberOrUndefined: numberValueTransform
 };
 
-// tslint:disable-next-line: interface-over-type-literal
-type ExtractionOptions = {
-  [ key: string ]: {
-    header: string;
-    transform: ValueTransform<unknown>;
-  }
-};
-
 function trimValues(values: any[]): any[] {
   let i = values.length;
   while (i > 0) {
@@ -70,8 +62,13 @@ export default class SheetHelper {
     this.sheet = sheet;
   }
 
-  public readColumnData<EO extends ExtractionOptions>(options: EO): {
-    [ header in keyof EO ]?: Array<(EO[header]["transform"] extends ValueTransform<infer T> ? T : unknown)>
+  public readColumnData<OPT extends {
+    [ key: string ]: {
+      header: string;
+      transform: ValueTransform<unknown>;
+    }
+  }>(options: OPT): {
+    [ header in keyof OPT ]?: Array<(OPT[header]["transform"] extends ValueTransform<infer T> ? T : unknown)>
   } {
     const keys = Object.keys(options);
     const headers = keys.map(key => options[key].header);
@@ -225,6 +222,59 @@ export default class SheetHelper {
         clearRange.clearContent();
       }
     });
+  }
+
+  public packKeysAndValues(keysAndValues: { [key: string]: any }): string[] {
+    const results: string[] = [];
+    const addObjectValues = (object: { [key: string]: any }, prefix: string) => {
+      Object.keys(object).forEach(key => {
+        if (key.match(/[=\.]/)) {
+          throw new Error("key can't contain '=' or '.': " + key);
+        }
+  
+        const value = object[key];
+        if (value === undefined) {
+          // skip
+        } else if (value !== null && typeof value === "object") {
+          addObjectValues(value, `${prefix}${key}.`);
+        } else {
+          results.push(`${prefix}${key}=${JSON.stringify(value)}`);
+        }
+      });
+    };
+    addObjectValues(keysAndValues, "");
+    return results;
+  }
+
+  public unpackKeysAndValues(entries: string[]): { [key: string]: any } {
+    const result: any = {};
+    const re = /^([^=]+)=(.*)$/;
+    entries.forEach(entry => {
+      const match = entry.match(re);
+      if (match !== null) {
+        let value: any;
+        try {
+          value = JSON.parse(match[2]);
+        } catch (e) {
+          Logger.log("error parsing entry", entry);
+          return;
+        }
+
+        const keyParts = match[1].split(".");
+        let targetObject = result;
+        while (keyParts.length > 1) {
+          const keyPart = keyParts.shift() as string;
+          if (!(keyPart in targetObject)) {
+            targetObject[keyPart] = {};
+          }
+          targetObject = targetObject[keyPart];
+        }
+
+        const key = keyParts[0];
+        targetObject[key] = value;
+      }
+    });
+    return result;
   }
 }
 
