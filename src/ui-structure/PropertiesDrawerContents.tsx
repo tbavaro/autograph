@@ -92,6 +92,7 @@ interface Props {
   datastore: Datastore;
   datastoreStatus: DatastoreStatus;
   document: GraphDocument | null;
+  showDataSourceSection: boolean;
 }
 
 interface State {
@@ -150,7 +151,11 @@ class PropertiesDrawerContents extends React.Component<Props, State> {
             : (
               <React.Fragment>
                 {this.renderSimulationProperties(this.props.document)}
-                {this.renderDataSourceProperties(this.props.document)}
+                {
+                  this.props.showDataSourceSection
+                    ? this.renderDataSourceProperties(this.props.document)
+                    : null
+                }
                 {this.renderOtherActions()}
               </React.Fragment>
             )

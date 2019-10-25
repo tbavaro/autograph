@@ -116,6 +116,7 @@ class App extends React.Component<Props, State> {
         actions={this.actionManager}
         datastore={this.datastore}
         datastoreStatus={this.state.datastoreStatus}
+        showDataSourceSection={!this.props.isEmbedded}
         ref={this.setPropertiesDrawerContentsRef}
       />
     );
