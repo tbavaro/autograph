@@ -5,6 +5,10 @@ import { valueIfUndefined } from "./util";
 type Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 
 const HEADER_MANAGED_AUTOGRAPH_SETTINGS = "managed:autograph:settings";
+const HEADER_MANAGED_NODE_ID = "managed:node:id";
+const HEADER_MANAGED_NODE_IS_LOCKED = "managed:node:isLocked";
+const HEADER_MANAGED_NODE_X = "managed:node:x";
+const HEADER_MANAGED_NODE_Y = "managed:node:y";
 
 const HEADER_NODE_ID = "node:id";
 const HEADER_NODE_LABEL = "node:label";
@@ -54,6 +58,22 @@ export default class AutographManagedSheet {
         header: HEADER_MANAGED_AUTOGRAPH_SETTINGS,
         transform: SheetHelperTransforms.asString
       },
+      managedNodeIds: {
+        header: HEADER_MANAGED_NODE_ID,
+        transform: SheetHelperTransforms.asString
+      },
+      managedNodeIsLocked: {
+        header: HEADER_MANAGED_NODE_IS_LOCKED,
+        transform: SheetHelperTransforms.asBooleanOrUndefined
+      },
+      managedNodeX: {
+        header: HEADER_MANAGED_NODE_X,
+        transform: SheetHelperTransforms.asNumberOrUndefined
+      },
+      managedNodeY: {
+        header: HEADER_MANAGED_NODE_Y,
+        transform: SheetHelperTransforms.asNumberOrUndefined
+      },
       nodeIds: {
         header: HEADER_NODE_ID,
         transform: SheetHelperTransforms.asStringOrUndefined
@@ -92,17 +112,39 @@ export default class AutographManagedSheet {
       }
     });
 
+    const managedNodeIds = values.managedNodeIds || [];
+    const managedNodeIsLocked = values.managedNodeIsLocked || [];
+    const managedNodeX = values.managedNodeX || [];
+    const managedNodeY = values.managedNodeY || [];
+
+    const managedNodeIdMap: { [id: string]: number } = {};
+    managedNodeIds.forEach((id, i) => {
+      if (id !== "" && !(id in managedNodeIdMap)) {
+        managedNodeIdMap[id] = i;
+      }
+    });
+
+    const nodes: LoadedData["nodes"] = zipObjects({
+      id: values.nodeIds || [],
+      label: values.nodeLabels || [],
+      secondaryLabel: values.nodeSecondaryLabels || [],
+      url: values.nodeUrls || [],
+      color: values.nodeColors || [],
+      rank: values.nodeRanks || [],
+    });
+    nodes.forEach(node => {
+      if (node.id !== undefined && node.id in managedNodeIdMap) {
+        const i = managedNodeIdMap[node.id];
+        node.isLocked = managedNodeIsLocked[i];
+        node.x = managedNodeX[i];
+        node.y = managedNodeY[i];
+      }
+    });
+
     return {
       version: 1,
       autographSettings: this.helper.unpackKeysAndValues(values.autographSettings || []),
-      nodes: zipObjects({
-        id: values.nodeIds || [],
-        label: values.nodeLabels || [],
-        secondaryLabel: values.nodeSecondaryLabels || [],
-        url: values.nodeUrls || [],
-        color: values.nodeColors || [],
-        rank: values.nodeRanks || [],
-      }),
+      nodes,
       links: zipObjects({
         source: values.linkSources || [],
         target: values.linkTargets || [],
@@ -118,19 +160,19 @@ export default class AutographManagedSheet {
         values: this.helper.packKeysAndValues(data.autographSettings)
       },
       {
-        header: "managed:node:id",
+        header: HEADER_MANAGED_NODE_ID,
         values: data.nodes.map(n => n.id)
       },
       {
-        header: "managed:node:isLocked",
+        header: HEADER_MANAGED_NODE_IS_LOCKED,
         values: data.nodes.map(n => n.isLocked)
       },
       {
-        header: "managed:node:x",
+        header: HEADER_MANAGED_NODE_X,
         values: data.nodes.map(n => valueIfUndefined<number | string>(n.x, ""))
       },
       {
-        header: "managed:node:y",
+        header: HEADER_MANAGED_NODE_Y,
         values: data.nodes.map(n => valueIfUndefined<number | string>(n.y, ""))
       }
     ]);

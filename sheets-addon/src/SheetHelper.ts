@@ -37,10 +37,22 @@ const numberValueTransform: ValueTransform<number | undefined> = (v: any) => {
   }
 };
 
+const booleanValueTransform: ValueTransform<boolean | undefined> = (v: any) => {
+  if (v === null || v === undefined || v === "") {
+    return undefined;
+  // tslint:disable-next-line: triple-equals
+  } else if (v == false || (typeof v === "string" && v.toUpperCase() === "FALSE")) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
 export const SheetHelperTransforms = {
   asString: stringValueTransform,
   asStringOrUndefined: stringOrUndefinedValueTransform,
-  asNumberOrUndefined: numberValueTransform
+  asNumberOrUndefined: numberValueTransform,
+  asBooleanOrUndefined: booleanValueTransform
 };
 
 function trimValues(values: any[]): any[] {

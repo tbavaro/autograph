@@ -11,6 +11,9 @@ export interface LoadedDataV1 extends Versioned<1> {
     url?: string;
     color?: string;
     rank?: number;
+    isLocked?: boolean;
+    x?: number;
+    y?: number;
   }>;
   links: Array<{
     source?: string;

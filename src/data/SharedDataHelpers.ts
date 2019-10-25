@@ -31,7 +31,10 @@ function mapNodes(ds: LoadedData["nodes"], nodeIdsAccum: Set<string>, errors: st
           secondaryLabel: d.secondaryLabel,
           url: d.url,
           color: d.color,
-          rank: d.rank
+          rank: d.rank,
+          isLocked: d.isLocked,
+          x: d.x,
+          y: d.y
         });
       }
     }
