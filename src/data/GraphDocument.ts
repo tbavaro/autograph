@@ -87,6 +87,7 @@ export type SimulationPropertyField = keyof ForceSimulationConfig;
 
 export class GraphDocument {
   public name: string;
+  public lastSavedAt: Date | null;
   public readonly nodes: MyNodeDatum[];  // NB: if these change, clear cachedNodeSearchHelper
   public readonly links: MyLinkDatum[];
   private data: GraphData.Document;
@@ -112,25 +113,32 @@ export class GraphDocument {
   }
 
   public static empty() {
-    return this.load("{}");
+    return this.load({ jsonData: "{}", lastSavedAt: null });
   }
 
-  public static load(jsonData: string, name?: string) {
-    const data = GraphData.load(JSON.parse(jsonData));
+  public static load(attrs: {
+    jsonData: string;
+    name?: string;
+    lastSavedAt: Date | null;
+  }) {
+    const data = GraphData.load(JSON.parse(attrs.jsonData));
     return new GraphDocument({
-      name: name || "Untitled",
-      data: data
+      name: attrs.name || "Untitled",
+      data: data,
+      lastSavedAt: attrs.lastSavedAt || null
     });
   }
 
   public constructor(
     attrs: {
       name: string,
-      data: GraphData.Document
+      data: GraphData.Document,
+      lastSavedAt: Date | null
     }
   ) {
     this.name = attrs.name;
     this.data = attrs.data;
+    this.lastSavedAt = attrs.lastSavedAt;
 
     if (this.data.displayConfig.nodeRenderMode === "raw_html") {
       console.warn(`ignoring deprecated render mode: ${this.data.displayConfig.nodeRenderMode}`);
@@ -169,7 +177,11 @@ export class GraphDocument {
   }
 
   public clone(): GraphDocument {
-    return GraphDocument.load(this.save(), this.name);
+    return GraphDocument.load({
+      jsonData: this.save(),
+      name: this.name,
+      lastSavedAt: null
+    });
   }
 
   public merge(serializedOtherDocument: GraphData.SerializedDocument): GraphDocument {
@@ -177,7 +189,8 @@ export class GraphDocument {
       internals.mergeSerializedDocuments(this.saveSGD(), serializedOtherDocument);
     return new GraphDocument({
       name: this.name,
-      data: serializedMergedDocument
+      data: serializedMergedDocument,
+      lastSavedAt: null
     });
   }
 

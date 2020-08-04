@@ -42,7 +42,7 @@ it("test load basic data only", () => {
     ]
   });
 
-  const document = GraphDocument.load(documentJSON);
+  const document = GraphDocument.load({ jsonData: documentJSON, lastSavedAt: null });
 
   // nodes
   expect(document.nodes.length).toEqual(3);
@@ -60,7 +60,7 @@ it("test load basic data only", () => {
 });
 
 it("test load name", () => {
-  const document = GraphDocument.load("{}", "my name");
+  const document = GraphDocument.load({ jsonData: "{}", name: "my name", lastSavedAt: null });
   expect(document.name).toEqual("my name");
 });
 
@@ -73,7 +73,7 @@ it("test load full data", () => {
     }
   });
 
-  const document = GraphDocument.load(documentJSON);
+  const document = GraphDocument.load({ jsonData: documentJSON, lastSavedAt: null });
 
   expect(document.name).toEqual("Untitled");
   expect(document.layoutState.layoutType).toEqual(DEFAULT_LAYOUT_TYPE);
@@ -103,7 +103,7 @@ it("test clone", () => {
     ]
   });
 
-  const document = GraphDocument.load(documentJSON, "named doc");
+  const document = GraphDocument.load({jsonData: documentJSON, name: "named doc", lastSavedAt: null });
   const clone = document.clone();
 
   expect(document.name).toEqual(clone.name);

@@ -130,6 +130,16 @@ class App extends React.Component<Props, State> {
       }
     ];
 
+    let title: string;
+    if (this.state.document && this.state.document.name) {
+      title = this.state.document.name;
+      if (this.state.document.lastSavedAt !== null) {
+        title += ` (as of ${this.state.document.lastSavedAt.toLocaleDateString("en-US")})`;
+      }
+    } else {
+      title = "Autograph";
+    }
+
     return (
       <React.Fragment>
         <CssBaseline/>
@@ -137,7 +147,7 @@ class App extends React.Component<Props, State> {
           actions={this.actionManager}
           leftDrawerChildren={navDrawerContents}
           rightDrawerChildren={propertiesDrawerContents}
-          title={(this.state.document && this.state.document.name) || "Autograph"}
+          title={title}
           innerRef={this.setAppRootRef}
           appBarActionButtons={appBarActionButtons}
           showSearchField={this.state.document !== null}
@@ -282,8 +292,11 @@ class App extends React.Component<Props, State> {
         "Loading...",
         this.datastore.loadFile(id).then(
           (result) => {
-            const document = GraphDocument.load(result.content);
-            document.name = result.name;
+            const document = GraphDocument.load({
+              jsonData: result.content,
+              name: result.name,
+              lastSavedAt: result.timestamp
+            });
             this.setDocument(document, id, result.canSave);
             this.closeLeftDrawer();
           },
@@ -417,7 +430,8 @@ class App extends React.Component<Props, State> {
         if (!shouldMerge || (this.state.document === null)) {
           document = new GraphDocument({
             name: sheetName === undefined ? "Imported sheet" : sheetName,
-            data: GraphData.applyDefaults(serializedDocument)
+            data: GraphData.applyDefaults(serializedDocument),
+            lastSavedAt: null
           });
           documentId = null;
           merged = false;
@@ -461,6 +475,9 @@ class App extends React.Component<Props, State> {
         "Saving...",
         this.datastore.updateFile(this.state.loadedDocumentId, data).then(
           () => {
+            if (this.state.document !== null) {
+              this.state.document.lastSavedAt = new Date();
+            }
             this.markDocumentClean();
           },
           (reason) => {

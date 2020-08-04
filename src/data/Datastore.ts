@@ -12,6 +12,7 @@ export interface DatastoreLoadFileResult<T> {
   name: string;
   content: T;
   canSave: boolean;
+  timestamp: Date | null;
 }
 
 // function transformLoadFileResult<T, U>(
@@ -153,7 +154,7 @@ export class Datastore extends BasicListenable<"status_changed"> {
 
   public async loadFile(fileId: string): Promise<DatastoreLoadFileResult<string>> {
     const [metadata, content] = await Promise.all([
-      this.getFileMetadata(fileId, ["name", "capabilities"]),
+      this.getFileMetadata(fileId, ["name", "capabilities", "modifiedTime"]),
       this.loadFileContent(fileId)
     ]);
 
@@ -161,7 +162,8 @@ export class Datastore extends BasicListenable<"status_changed"> {
       id: fileId,
       name: metadata.name || "Untitled",
       content: content,
-      canSave: this.interpretCanSave(metadata)
+      canSave: this.interpretCanSave(metadata),
+      timestamp: metadata.modifiedTime ? new Date(Date.parse(metadata.modifiedTime)) : null
     };
   }
 

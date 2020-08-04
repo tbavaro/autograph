@@ -96,7 +96,8 @@ export function documentFromLoadedData(data: LoadedData): GraphDocument {
 
   return new GraphDocument({
     name: "embedded data",
-    data: GraphData.load(serializedGraphData)
+    data: GraphData.load(serializedGraphData),
+    lastSavedAt: null
   });
 }
 
