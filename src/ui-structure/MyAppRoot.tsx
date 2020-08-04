@@ -38,6 +38,7 @@ export interface Props extends WithStyles<ReturnType<typeof stylesFunc>> {
   leftDrawerChildren: any;
   rightDrawerChildren: any;
   title: string;
+  subtitle: string | null;
   appBarActionButtons?: ActionButtonDef[];
   showSearchField: boolean;
   renderSearchPopperContents?: (searchQuery: string) => JSX.Element | string | null;
@@ -65,6 +66,7 @@ export class MyAppRootInner extends React.Component<Props, State> {
         <MyAppBar
           actions={this.props.actions}
           title={this.props.title}
+          subtitle={this.props.subtitle}
           onClickMenuButton={this.openLeftDrawer}
           actionButtons={this.props.appBarActionButtons}
           showSearchField={this.props.showSearchField}

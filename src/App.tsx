@@ -131,10 +131,11 @@ class App extends React.Component<Props, State> {
     ];
 
     let title: string;
+    let subtitle: string | null = null;
     if (this.state.document && this.state.document.name) {
       title = this.state.document.name;
       if (this.state.document.lastSavedAt !== null) {
-        title += ` (as of ${this.state.document.lastSavedAt.toLocaleDateString("en-US")})`;
+        subtitle = `(last updated ${this.state.document.lastSavedAt.toLocaleDateString()})`;
       }
     } else {
       title = "Autograph";
@@ -148,6 +149,7 @@ class App extends React.Component<Props, State> {
           leftDrawerChildren={navDrawerContents}
           rightDrawerChildren={propertiesDrawerContents}
           title={title}
+          subtitle={subtitle}
           innerRef={this.setAppRootRef}
           appBarActionButtons={appBarActionButtons}
           showSearchField={this.state.document !== null}

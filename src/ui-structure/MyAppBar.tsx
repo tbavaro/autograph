@@ -27,6 +27,9 @@ const stylesFunc = (theme: Theme): StyleRules<string> => ({
   title: {
     flexGrow: 1
   },
+  subtitle: {
+    opacity: 0.5
+  },
   menuButton: {
     marginLeft: -18,
     marginRight: 10
@@ -92,6 +95,7 @@ export interface Props extends WithStyles<ReturnType<typeof stylesFunc>> {
   actions: Actions;
 
   title: string;
+  subtitle: string | null;
   onClickMenuButton: () => void;
 
   actionButtons?: ActionButtonDef[];
@@ -111,9 +115,18 @@ class MyAppBar extends React.PureComponent<Props, {}> {
           <IconButton className={classes.menuButton} color="inherit" aria-label="Menu" onClick={this.props.onClickMenuButton}>
             <MenuIcon/>
           </IconButton>
-          <Typography className={classes.title} variant="h6" color="inherit" noWrap={true}>
-            {this.props.title}
-          </Typography>
+          <div>
+            <Typography className={classes.title} variant="h6" color="inherit" noWrap={true} inline={true}>
+              {this.props.title}
+            </Typography>
+            {
+              this.props.subtitle === null 
+                ? null 
+                : <Typography className={classes.subtitle} variant="body1" color="inherit" noWrap={true} inline={true}>
+                    &nbsp;{this.props.subtitle}
+                  </Typography>
+            }          
+          </div>
           {
             this.props.showSearchField ? this.renderSearchField() : null
           }
